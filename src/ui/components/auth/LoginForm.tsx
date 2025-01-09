@@ -3,25 +3,34 @@
 import React from "react";
 import { Form, Input, Button, Checkbox, Divider, Typography } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
+import Image from "next/image";
 
 const { Title, Text, Link } = Typography;
 
+interface LoginFormValues {
+  email: string;
+  password: string;
+  remember?: boolean;
+}
+
 const LoginForm: React.FC = () => {
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
+  const onFinish = (values: LoginFormValues) => {
+    console.log("성공:", values);
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
+  const onFinishFailed = (errorInfo: unknown) => {
+    console.log("실패:", errorInfo);
   };
 
   return (
     <div style={{ maxWidth: 400, margin: "0 auto", padding: "20px" }}>
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <img
+        <Image
           src="/logo.svg"
           alt="Logo"
-          style={{ width: "100px", height: "100px", marginBottom: "10px" }}
+          width={100}
+          height={100}
+          style={{ marginBottom: "10px" }}
         />
         <Title level={4}>Sign in to your account</Title>
         <Text>
@@ -55,10 +64,16 @@ const LoginForm: React.FC = () => {
         </Form.Item>
 
         <Form.Item name="remember" valuePropName="checked">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Checkbox>Remember me</Checkbox>
-                <Link href="/forgot-password">Forgot password?</Link>
-            </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Checkbox>Remember me</Checkbox>
+            <Link href="/forgot-password">Forgot password?</Link>
+          </div>
         </Form.Item>
 
         <Form.Item>
@@ -75,10 +90,12 @@ const LoginForm: React.FC = () => {
         </Button>
         <Button
           icon={
-            <img
+            <Image
               src="/kakao-icon.svg"
               alt="Kakao"
-              style={{ width: "20px", height: "20px" }}
+              width={20}
+              height={20}
+              style={{ display: "inline-block" }}
             />
           }
           size="large"
