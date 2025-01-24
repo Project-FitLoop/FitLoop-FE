@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Typography, Layout, message } from "antd";
 import axios from "axios";
 
@@ -45,7 +45,7 @@ const Dashboard: React.FC = () => {
   );
 
   // 사용자 정보 요청
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = useCallback(async () => {
     try {
       const response = await apiClient.get("/api/user-info", {
         headers: {
@@ -53,15 +53,19 @@ const Dashboard: React.FC = () => {
         },
       });
       setUsername(response.data);
-    } catch (error: any) {
-      message.error("사용자 정보를 불러올 수 없습니다.");
+    } catch (error: unknown) { // UNKNOWN 타입으로 변경
+      if (error instanceof Error) {
+        message.error(error.message || "사용자 정보를 불러올 수 없습니다.");
+      } else {
+        message.error("알 수 없는 오류가 발생했습니다.");
+      }
       setUsername(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchUserInfo();
-  }, []);
+  }, [fetchUserInfo]);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
