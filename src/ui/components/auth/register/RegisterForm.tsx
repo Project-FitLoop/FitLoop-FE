@@ -21,8 +21,13 @@ const RegisterForm: React.FC = () => {
 
       // 회원가입 성공 후 로그인 페이지로 리다이렉트
       window.location.href = "/login";
-    } catch (error: any) {
-      message.error(error.message || "회원가입 실패! 사용자 이름이 중복되었을 수 있습니다.");
+    } catch (error: unknown) {
+      // 에러 타입 확인 및 처리
+      if (error instanceof Error) {
+        message.error(error.message || "회원가입 실패! 사용자 이름이 중복되었을 수 있습니다.");
+      } else {
+        message.error("알 수 없는 오류가 발생했습니다.");
+      }
     }
   };
 
@@ -39,7 +44,7 @@ const RegisterForm: React.FC = () => {
         <Form.Item
           label="Username"
           name="username"
-          rules={[{ required: true, message: "Please input your username!" }]}
+          rules={[{ required: true, message: "ID를 입력해주세요" }]}
         >
           <Input placeholder="Enter your username" />
         </Form.Item>
@@ -47,7 +52,11 @@ const RegisterForm: React.FC = () => {
         <Form.Item
           label="Password"
           name="password"
-          rules={[{ required: true, message: "Please input your password!" }]}
+          rules={[
+            { required: true, message: "패스워드를 입력해주세요" },
+            // 비밀번호 최소 길이 규칙 추가
+            { min: 6, message: "비밀번호는 최소 6글자 이상이어야 합니다" },
+          ]}
         >
           <Input.Password placeholder="Enter your password" />
         </Form.Item>
