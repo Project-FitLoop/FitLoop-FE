@@ -35,6 +35,7 @@ const LoginForm: React.FC = () => {
   };
 
   const onFinishFailed = (errorInfo: unknown) => {
+    console.error("실패:", errorInfo);
     message.error("로그인 양식을 확인해주세요.");
   };
 
