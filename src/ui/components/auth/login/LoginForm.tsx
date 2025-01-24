@@ -25,14 +25,16 @@ const LoginForm: React.FC = () => {
 
       // 로그인 성공 후 리다이렉트
       window.location.href = "/dashboard";
-    } catch (error: any) {
-      // 로그인 실패 처리
-      message.error(error.message || "로그인 실패! 사용자 이름 또는 비밀번호를 확인해주세요.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(error.message || "로그인 실패! 사용자 이름 또는 비밀번호를 확인해주세요.");
+      } else {
+        message.error("알 수 없는 오류가 발생했습니다.");
+      }
     }
   };
 
   const onFinishFailed = (errorInfo: unknown) => {
-    console.log("실패:", errorInfo);
     message.error("로그인 양식을 확인해주세요.");
   };
 
