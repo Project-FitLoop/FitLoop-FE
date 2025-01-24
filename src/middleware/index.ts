@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export function middleware(req: any) {
+export function middleware(req: NextRequest) {
   // 요청 헤더에서 Access 토큰을 확인
   const access = req.cookies.get("access");
 
@@ -15,5 +16,5 @@ export function middleware(req: any) {
 
 export const config = {
   // 미들웨어가 적용될 경로를 지정
-  matcher: ["/protected/:path*"], 
+  matcher: ["/protected/:path*"],
 };
