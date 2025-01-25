@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Typography, Progress, Button } from "antd";
 
 const { Title } = Typography;
@@ -13,6 +13,20 @@ const steps = [
 ];
 
 const RegisterForm = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
   return (
     <div
       style={{
@@ -28,20 +42,32 @@ const RegisterForm = () => {
     >
       {/* 상단 진행 상황 */}
       <div style={{ padding: "20px 16px" }}>
-        <Progress percent={25} showInfo={false} />
-        <Title level={5}>{steps[0].title}</Title>
+        <Progress percent={(currentStep + 1) * (100 / steps.length)} showInfo={false} />
+        <Title level={5}>{steps[currentStep].title}</Title>
       </div>
 
       {/* 하단 버튼 */}
       <div
         style={{
           display: "flex",
-          justifyContent: "center",
+          justifyContent: currentStep > 0 ? "space-between" : "center",
           padding: "0 16px",
         }}
       >
-        <Button type="primary" style={{ width: "100%", height: 48 }}>
-          다음
+        {currentStep > 0 && (
+          <Button
+            style={{ width: "calc(50% - 8px)", height: 48 }}
+            onClick={handlePrevious}
+          >
+            이전
+          </Button>
+        )}
+        <Button
+          type="primary"
+          style={{ width: currentStep > 0 ? "calc(50% - 8px)" : "100%", height: 48 }}
+          onClick={handleNext}
+        >
+          {currentStep === steps.length - 1 ? "완료" : "다음"}
         </Button>
       </div>
     </div>
