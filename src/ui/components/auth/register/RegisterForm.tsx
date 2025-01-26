@@ -39,12 +39,33 @@ const RegisterForm: React.FC = () => {
     }
   };
 
+  // 필드별 유효성 검사 규칙
+  const validationRules: Record<string, any> = {
+    username: [
+      { required: true, message: "아이디를 입력해 주세요." },
+      { pattern: /^[a-zA-Z0-9_-]{3,16}$/, message: "아이디는 3~16자 이내의 영문, 숫자, -, _만 가능합니다." },
+    ],
+    password: [
+      { required: true, message: "비밀번호를 입력해 주세요." },
+      { min: 8, message: "비밀번호는 최소 8자 이상이어야 합니다." },
+      { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/, message: "영문자와 숫자를 포함해야 합니다." },
+    ],
+    email: [
+      { required: true, message: "이메일을 입력해 주세요." },
+      { type: "email" as const, message: "유효한 이메일 주소를 입력해 주세요." },
+    ],
+    name: [
+      { required: true, message: "이름을 입력해 주세요." },
+      { pattern: /^[가-힣a-zA-Z\s]{2,30}$/, message: "이름은 2~30자의 한글, 영문만 가능합니다." },
+    ],
+  };
+
   return (
     <div
       style={{
         width: "100%",
-        maxWidth: 400, 
-        margin: "0 auto", 
+        maxWidth: 400,
+        margin: "0 auto",
         height: "100vh",
         display: "flex",
         flexDirection: "column",
@@ -105,11 +126,12 @@ const RegisterForm: React.FC = () => {
       >
         <Form.Item
           name={steps[currentStep].field}
-          rules={[{ required: true, message: steps[currentStep].title }]}
+          rules={validationRules[steps[currentStep].field as keyof RegisterFormValues]} // 유효성 검사 규칙
           style={{ marginBottom: 40 }}
         >
           <Input
             placeholder={steps[currentStep].placeholder}
+            type={steps[currentStep].field === "password" ? "password" : "text"} // 비밀번호 필드는 입력 타입 변경
             style={{
               border: "none",
               borderBottom: "1px solid #ddd",
