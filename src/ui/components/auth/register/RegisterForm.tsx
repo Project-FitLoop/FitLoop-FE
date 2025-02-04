@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Form, Input, Button, Typography, Progress } from "antd";
+import type { Rule } from "antd/es/form";
 
 const { Title, Text } = Typography;
 
@@ -17,6 +18,7 @@ interface RegisterFormValues {
   password?: string;
   email?: string;
   name?: string;
+  
 }
 
 const RegisterForm: React.FC = () => {
@@ -40,7 +42,7 @@ const RegisterForm: React.FC = () => {
   };
 
   // 필드별 유효성 검사 규칙
-  const validationRules: Record<string, any> = {
+  const validationRules: Record<string, unknown> = {
     username: [
       { required: true, message: "아이디를 입력해 주세요." },
       { pattern: /^[a-zA-Z0-9_-]{3,16}$/, message: "아이디는 3~16자 이내의 영문, 숫자, -, _만 가능합니다." },
@@ -126,7 +128,7 @@ const RegisterForm: React.FC = () => {
       >
         <Form.Item
           name={steps[currentStep].field}
-          rules={validationRules[steps[currentStep].field as keyof RegisterFormValues]} // 유효성 검사 규칙
+          rules={validationRules[steps[currentStep].field as keyof RegisterFormValues] as Rule[]} 
           style={{ marginBottom: 40 }}
         >
           <Input

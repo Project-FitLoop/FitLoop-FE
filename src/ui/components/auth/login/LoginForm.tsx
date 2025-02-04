@@ -4,7 +4,7 @@ import React from "react";
 import { Form, Input, Button, Checkbox, Divider, Typography, message } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import Image from "next/image";
-import { loginUser } from "@/services/auth/auth"; // API 호출 파일 import
+import { loginUser } from "@/services/api/auth"; // API 호출 파일 import
 
 const { Title, Text, Link } = Typography;
 
