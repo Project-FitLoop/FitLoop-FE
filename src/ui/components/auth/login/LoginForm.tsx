@@ -1,25 +1,42 @@
 "use client";
 
 import React from "react";
-import { Form, Input, Button, Checkbox, Divider, Typography } from "antd";
+import { Form, Input, Button, Checkbox, Divider, Typography, message } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import Image from "next/image";
+import { loginUser } from "@/services/api/auth"; // API 호출 파일 import
 
 const { Title, Text, Link } = Typography;
 
 interface LoginFormValues {
-  email: string;
+  username: string;
   password: string;
-  remember?: boolean;
 }
 
 const LoginForm: React.FC = () => {
-  const onFinish = (values: LoginFormValues) => {
-    console.log("성공:", values);
+  const onFinish = async (values: LoginFormValues) => {
+    try {
+      // 로그인 API 호출
+      const accessToken = await loginUser(values.username, values.password);
+
+      // Access Token을 로컬 스토리지에 저장
+      window.localStorage.setItem("access", accessToken);
+      message.success("로그인 성공!");
+
+      // 로그인 성공 후 리다이렉트
+      window.location.href = "/dashboard";
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(error.message || "로그인 실패! 사용자 이름 또는 비밀번호를 확인해주세요.");
+      } else {
+        message.error("알 수 없는 오류가 발생했습니다.");
+      }
+    }
   };
 
   const onFinishFailed = (errorInfo: unknown) => {
-    console.log("실패:", errorInfo);
+    console.error("실패:", errorInfo);
+    message.error("로그인 양식을 확인해주세요.");
   };
 
   return (
@@ -45,14 +62,11 @@ const LoginForm: React.FC = () => {
         layout="vertical"
       >
         <Form.Item
-          label="Email address"
-          name="email"
-          rules={[
-            { required: true, message: "Please input your email!" },
-            { type: "email", message: "Please enter a valid email!" },
-          ]}
+          label="Username"
+          name="username"
+          rules={[{ required: true, message: "Please input your username!" }]}
         >
-          <Input placeholder="Enter your email" />
+          <Input placeholder="Enter your username" />
         </Form.Item>
 
         <Form.Item
