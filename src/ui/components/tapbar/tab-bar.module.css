@@ -1,0 +1,67 @@
+.tabBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    z-index: 50;
+    height: 64px;
+  }
+  
+  .menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+    padding: 0;
+    border: none !important;
+  }
+  
+  .tabItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    color: #757575;
+    text-decoration: none;
+  }
+  
+  /* 기본 아이콘 */
+  .iconWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .tabText {
+    font-size: 12px;
+    color: #757575;
+    font-weight: normal;
+    margin-top: 0px;  
+    line-height: 2;
+  }
+  
+  .specialTab {
+    position: relative;
+    top: -10px; 
+  }
+  
+  .specialIconWrapper {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
