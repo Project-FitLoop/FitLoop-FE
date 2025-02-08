@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import Loading from './Loading';
+import Loading from '@/app/loading';
 
 const LoadingWrapper: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);

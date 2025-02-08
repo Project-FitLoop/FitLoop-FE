@@ -2,7 +2,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Providers from "./providers";
+import "antd/dist/reset.css";
 import "./globals.css";
+import TabBar from "@/ui/components/tapbar/tapbar";
+import ClientWrapper from "./clientWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,9 +30,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <main className="flex-1 w-full overflow-auto pb-[80px]">
+            <ClientWrapper>{children}</ClientWrapper></main>
+          <TabBar />
+        </Providers>
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import LoadingWrapper from '@/components/LoadingWrapper';
+import LoadingWrapper from '@/components/loadingWrapper';
 
 const DelayedLoadingPage = () => {
   return (
