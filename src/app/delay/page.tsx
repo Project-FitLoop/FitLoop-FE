@@ -1,7 +1,7 @@
 import React from 'react';
 import LoadingWrapper from '@/components/loadingWrapper';
 
-const MainPage = () => {
+const DelayedLoadingPage = () => {
   return (
     <div>
       <LoadingWrapper />
@@ -9,4 +9,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default DelayedLoadingPage;
