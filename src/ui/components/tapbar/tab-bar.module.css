@@ -3,7 +3,6 @@
     bottom: 0;
     left: 0;
     width: 100%;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,12 +13,11 @@
   
   .menu {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     width: 100%;
     max-width: 500px;
     padding: 0;
-    border: none !important;
   }
   
   .tabItem {
@@ -37,8 +35,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
   }
   
   .tabText {

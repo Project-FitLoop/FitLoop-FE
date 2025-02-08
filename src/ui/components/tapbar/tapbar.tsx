@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Menu } from "antd";
 import styles from "@/ui/components/tapbar/tab-bar.module.css";
 
 const tabs = [
@@ -21,21 +20,18 @@ const TabBar: React.FC = () => {
   const pathname = usePathname();
   if (hiddenPages.includes(pathname)) return null;
 
-  const menuItems = tabs.map((tab) => ({
-    key: tab.path,
-    label: (
-      <Link href={tab.path} className={`${styles.tabItem} ${tab.special ? styles.specialTab : ""}`}>
-        <div className={`${styles.iconWrapper} ${tab.special ? styles.specialIconWrapper : ""}`}>
-          <Image src={tab.icon} alt={tab.name} width={24} height={24} priority />
-        </div>
-        <span className={`${styles.tabText} ${tab.special ? styles.specialText : ""}`}>{tab.name}</span>
-      </Link>
-    ),
-  }));
-
   return (
     <div className={styles.tabBar}>
-      <Menu mode="horizontal" selectedKeys={[pathname]} className={styles.menu} items={menuItems} />
+      <div className={styles.menu}>
+        {tabs.map((tab) => (
+          <Link key={tab.path} href={tab.path} className={`${styles.tabItem} ${tab.special ? styles.specialTab : ""}`}>
+            <div className={`${styles.iconWrapper} ${tab.special ? styles.specialIconWrapper : ""}`}>
+              <Image src={tab.icon} alt={tab.name} width={24} height={24} priority />
+            </div>
+            <span className={`${styles.tabText} ${tab.special ? styles.specialText : ""}`}>{tab.name}</span>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };
