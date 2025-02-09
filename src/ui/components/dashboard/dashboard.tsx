@@ -8,7 +8,7 @@ const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
 
 const Dashboard: React.FC = () => {
-  const { data: username, isLoading } = useUserInfo();
+  const { data, isLoading } = useUserInfo();
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -18,8 +18,8 @@ const Dashboard: React.FC = () => {
       <Content style={{ padding: "20px", textAlign: "center" }}>
         {isLoading ? (
           <Title level={5}>사용자 정보를 불러오는 중...</Title>
-        ) : username ? (
-          <Title level={4}>{`${username}님, 안녕하세요!`}</Title>
+        ) : data?.username ? (
+          <Title level={4}>{`${data.username}님, 안녕하세요!`}</Title>
         ) : (
           <Title level={5}>사용자 정보를 가져올 수 없습니다.</Title>
         )}

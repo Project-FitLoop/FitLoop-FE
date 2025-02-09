@@ -8,7 +8,7 @@ export const fetchUserInfo = async (): Promise<{ username: string }> => {
     throw new Error("Access Token이 없습니다. 로그인해주세요.");
   }
 
-  const response = await instance.get<{ username: string }>("/api/user-info", {
+  const response = await instance.get<{ username: string }>("/user", {
     headers: {
       access: `${accessToken}`,
     },
