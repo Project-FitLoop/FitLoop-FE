@@ -6,6 +6,7 @@ import "antd/dist/reset.css";
 import "./globals.css";
 import TabBar from "@/ui/components/tapbar/tapbar";
 import ClientWrapper from "./clientWrapper";
+import '@ant-design/v5-patch-for-react-19';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
