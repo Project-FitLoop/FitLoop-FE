@@ -14,7 +14,7 @@ const tabs = [
   { name: "마이페이지", path: "/mypage", icon: "/assets/mypage.png" },
 ];
 
-const hiddenPages = ["/admin"];
+const hiddenPages = ["/admin", "/register"];
 
 const TabBar: React.FC = () => {
   const pathname = usePathname();
