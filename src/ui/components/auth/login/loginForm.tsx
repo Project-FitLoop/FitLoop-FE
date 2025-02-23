@@ -4,7 +4,7 @@ import React from "react";
 import { Form, Input, Button, Checkbox, Divider, Typography, message } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import Image from "next/image";
-import { loginUser } from "@/services/api/auth"; // API 호출 파일 import
+import { loginUser, getGoogleLoginUrl } from "@/services/api/auth";
 
 const { Title, Text, Link } = Typography;
 
@@ -25,7 +25,8 @@ const LoginForm: React.FC = () => {
 
       // 로그인 성공 후 리다이렉트
       window.location.href = "/dashboard";
-    } catch (error: unknown) {
+    } catch (error) {
+      console.error("로그인 오류:", error);
       if (error instanceof Error) {
         message.error(error.message || "로그인 실패! 사용자 이름 또는 비밀번호를 확인해주세요.");
       } else {
@@ -38,6 +39,22 @@ const LoginForm: React.FC = () => {
     console.error("실패:", errorInfo);
     message.error("로그인 양식을 확인해주세요.");
   };
+
+  //Google 로그인 URL 요청 및 리다이렉트
+  const handleGoogleLogin = async () => {
+    try {
+      const googleLoginUrl = await getGoogleLoginUrl();
+  
+      if (googleLoginUrl) {
+        window.location.href = googleLoginUrl;
+      } else {
+        message.error("Google 로그인 URL을 가져올 수 없습니다.");
+      }
+    } catch {
+      message.error("Google 로그인 요청 실패!");
+    }
+  };
+  
 
   return (
     <div style={{ maxWidth: 400, margin: "0 auto", padding: "20px" }}>
@@ -99,7 +116,7 @@ const LoginForm: React.FC = () => {
 
       <Divider>Or continue with</Divider>
       <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-        <Button icon={<GoogleOutlined />} size="large" block>
+        <Button icon={<GoogleOutlined />} size="large" block onClick={handleGoogleLogin}>
           Google
         </Button>
         <Button

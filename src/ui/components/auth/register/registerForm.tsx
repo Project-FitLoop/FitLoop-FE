@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Typography, Progress } from "antd";
 import type { Rule } from "antd/es/form";
+import { registerUser } from "@/services/api/auth";
 
 const { Title, Text } = Typography;
 
@@ -11,6 +12,7 @@ const steps = [
   { title: "비밀번호를\n입력해 주세요.", field: "password", placeholder: "비밀번호" },
   { title: "이메일을\n입력해 주세요.", field: "email", placeholder: "이메일" },
   { title: "이름을\n입력해 주세요.", field: "name", placeholder: "이름" },
+  { title: "생년월일을\n입력해 주세요.", field: "birthday", placeholder: "YYYY-MM-DD" },
 ];
 
 interface RegisterFormValues {
@@ -18,20 +20,36 @@ interface RegisterFormValues {
   password?: string;
   email?: string;
   name?: string;
-  
+  birthday?: string;
 }
 
 const RegisterForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formValues, setFormValues] = useState<RegisterFormValues>({});
 
-  const handleNext = (values: Partial<RegisterFormValues>) => {
-    setFormValues({ ...formValues, ...values });
+  const handleNext = async (values: Partial<RegisterFormValues>) => {
+    const updatedValues = { ...formValues, ...values };
+    setFormValues(updatedValues);
+    
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      console.log("회원가입 완료:", formValues);
-      alert("회원가입이 완료되었습니다!");
+      try {
+        await registerUser(
+          updatedValues.username!,
+          updatedValues.password!,
+          updatedValues.email!,
+          updatedValues.name!,
+          updatedValues.birthday!
+        );
+        alert("회원가입이 완료되었습니다!");
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          alert(error.message);
+        } else {
+          alert("알 수 없는 오류가 발생했습니다.");
+        }
+      }
     }
   };
 
@@ -59,6 +77,10 @@ const RegisterForm: React.FC = () => {
     name: [
       { required: true, message: "이름을 입력해 주세요." },
       { pattern: /^[가-힣a-zA-Z\s]{2,30}$/, message: "이름은 2~30자의 한글, 영문만 가능합니다." },
+    ],
+    birthday: [
+      { required: true, message: "생년월일을 입력해 주세요." },
+      { pattern: /^\d{4}-\d{2}-\d{2}$/, message: "생년월일은 YYYY-MM-DD 형식이어야 합니다." },
     ],
   };
 

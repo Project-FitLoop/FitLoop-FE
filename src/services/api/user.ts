@@ -10,7 +10,7 @@ export const fetchUserInfo = async (): Promise<{ username: string }> => {
 
   const response = await instance.get<{ username: string }>("/user", {
     headers: {
-      access: `${accessToken}`,
+      access:`${accessToken}`,
     },
   });
 
