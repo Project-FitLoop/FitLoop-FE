@@ -90,8 +90,6 @@ export const reissueAccessToken = async (): Promise<string> => {
     if (!accessToken) {
       throw new Error("Access Token이 응답 헤더에 없습니다.");
     }
-
-    console.log("Access Token 갱신 성공:", accessToken);
     return accessToken;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -105,17 +103,25 @@ export const reissueAccessToken = async (): Promise<string> => {
 };
 
 //로그아웃 API 호출
-// export const logoutUser = async (): Promise<void> => {
-//   try {
-//     await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
-//     console.log("로그아웃 성공!");
-//   } catch (error: unknown) {
-//     if (axios.isAxiosError(error)) {
-//       console.error("로그아웃 실패:", error.response?.data || error.message);
-//       throw new Error(error.response?.data?.message || "로그아웃 요청 실패");
-//     } else {
-//       console.error("로그아웃 실패: 알 수 없는 오류", error);
-//       throw new Error("알 수 없는 오류가 발생했습니다.");
-//     }
-//   }
-// };
+export const logoutUser = async (): Promise<void> => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
+
+    if (response.status === 200) {
+      console.log("로그아웃 성공!");
+
+      // sessionStorage.removeItem("user");
+      localStorage.removeItem("access");
+    } else {
+      throw new Error("로그아웃 요청 실패");
+    }
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("로그아웃 실패:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "로그아웃 요청 실패");
+    } else {
+      console.error("로그아웃 실패: 알 수 없는 오류", error);
+      throw new Error("알 수 없는 오류가 발생했습니다.");
+    }
+  }
+};
