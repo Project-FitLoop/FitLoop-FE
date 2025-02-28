@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Form, Input, Button, Checkbox, Divider, Typography, message } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import Image from "next/image";
@@ -14,7 +14,7 @@ interface LoginFormValues {
 }
 
 const LoginForm: React.FC = () => {
-  const onFinish = async (values: LoginFormValues) => {
+  const onFinish = useCallback(async (values: LoginFormValues) => {
     try {
       // 로그인 API 호출
       const accessToken = await loginUser(values.username, values.password);
@@ -33,18 +33,18 @@ const LoginForm: React.FC = () => {
         message.error("알 수 없는 오류가 발생했습니다.");
       }
     }
-  };
+  }, []);
 
-  const onFinishFailed = (errorInfo: unknown) => {
+  const onFinishFailed = useCallback((errorInfo: unknown) => {
     console.error("실패:", errorInfo);
     message.error("로그인 양식을 확인해주세요.");
-  };
+  }, []);
 
-  //Google 로그인 URL 요청 및 리다이렉트
-  const handleGoogleLogin = async () => {
+  // Google 로그인 URL 요청 및 리다이렉트
+  const handleGoogleLogin = useCallback(async () => {
     try {
       const googleLoginUrl = await getGoogleLoginUrl();
-  
+
       if (googleLoginUrl) {
         window.location.href = googleLoginUrl;
       } else {
@@ -53,24 +53,18 @@ const LoginForm: React.FC = () => {
     } catch {
       message.error("Google 로그인 요청 실패!");
     }
-  };
-  
+  }, []);
 
   return (
     <div style={{ maxWidth: 400, margin: "0 auto", padding: "20px" }}>
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <Image
-          src="/logo.svg"
-          alt="Logo"
-          width={100}
-          height={100}
-          style={{ marginBottom: "10px" }}
-        />
+        <Image src="/logo.svg" alt="Logo" width={100} height={100} />
         <Title level={4}>Sign in to your account</Title>
         <Text>
-          Not a member? <Link href="/register">Start a 14 day free trial</Link>
+          Not a member? <Link href="/register">Start a 14-day free trial</Link>
         </Text>
       </div>
+
       <Form
         name="login"
         initialValues={{ remember: true }}
@@ -95,13 +89,7 @@ const LoginForm: React.FC = () => {
         </Form.Item>
 
         <Form.Item name="remember" valuePropName="checked">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <Checkbox>Remember me</Checkbox>
             <Link href="/forgot-password">Forgot password?</Link>
           </div>
@@ -126,7 +114,6 @@ const LoginForm: React.FC = () => {
               alt="Kakao"
               width={20}
               height={20}
-              style={{ display: "inline-block" }}
             />
           }
           size="large"
