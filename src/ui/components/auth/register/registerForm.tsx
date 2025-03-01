@@ -30,7 +30,7 @@ const RegisterForm: React.FC = () => {
   const handleNext = async (values: Partial<RegisterFormValues>) => {
     const updatedValues = { ...formValues, ...values };
     setFormValues(updatedValues);
-    
+
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -94,7 +94,7 @@ const RegisterForm: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        backgroundColor: "#fff",
+        backgroundColor: "var(--bg-white)",
       }}
     >
       {/* 상단 진행 상황 */}
@@ -102,8 +102,8 @@ const RegisterForm: React.FC = () => {
         <Progress
           percent={(currentStep + 1) * (100 / steps.length)}
           showInfo={false}
-          strokeColor="#999"
-          trailColor="#eee"
+          strokeColor="var(--border-gray)"
+          trailColor="var(--border-light-gray)"
           style={{
             width: "100%",
             height: 8,
@@ -116,7 +116,7 @@ const RegisterForm: React.FC = () => {
           <Text
             style={{
               fontSize: 14,
-              color: "#999",
+              color: "var(--text-gray)",
               display: "block",
               marginBottom: 8,
             }}
@@ -130,7 +130,7 @@ const RegisterForm: React.FC = () => {
               fontWeight: 600,
               fontSize: 20,
               lineHeight: "1.5",
-              color: "#333",
+              color: "var(--text-black)",
               whiteSpace: "pre-wrap",
             }}
           >
@@ -150,7 +150,7 @@ const RegisterForm: React.FC = () => {
       >
         <Form.Item
           name={steps[currentStep].field}
-          rules={validationRules[steps[currentStep].field as keyof RegisterFormValues] as Rule[]} 
+          rules={validationRules[steps[currentStep].field as keyof RegisterFormValues] as Rule[]}
           style={{ marginBottom: 40 }}
         >
           <Input
@@ -158,7 +158,7 @@ const RegisterForm: React.FC = () => {
             type={steps[currentStep].field === "password" ? "password" : "text"} // 비밀번호 필드는 입력 타입 변경
             style={{
               border: "none",
-              borderBottom: "1px solid #ddd",
+              borderBottom: "1px solid var(--border-light-gray)",
               borderRadius: 0,
               padding: "8px 0",
               fontSize: 16,
@@ -180,8 +180,8 @@ const RegisterForm: React.FC = () => {
             style={{
               width: "calc(50% - 8px)",
               height: 48,
-              backgroundColor: "#f0f0f0",
-              border: "1px solid #ccc",
+              backgroundColor: "var(--bg-gray)",
+              border: "1px solid var(--border-gray)",
               fontSize: 16,
               fontWeight: 600,
             }}
@@ -196,9 +196,9 @@ const RegisterForm: React.FC = () => {
           style={{
             width: currentStep > 0 ? "calc(50% - 8px)" : "100%",
             height: 48,
-            backgroundColor: "#333",
+            backgroundColor: "var(--text-black)",
             border: "none",
-            color: "#fff",
+            color: "var(--text-white)",
             fontSize: 16,
             fontWeight: 600,
           }}

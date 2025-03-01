@@ -34,7 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <Providers>
-          <main className="flex-1 w-full overflow-auto pb-[80px]">
+          <main className="flex-1 w-full overflow-auto">
             <ClientWrapper>{children}</ClientWrapper></main>
           <TabBar />
         </Providers>

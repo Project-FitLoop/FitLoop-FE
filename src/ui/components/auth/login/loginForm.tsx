@@ -2,7 +2,6 @@
 
 import React, { useCallback } from "react";
 import { Form, Input, Button, Checkbox, Divider, Typography, message } from "antd";
-import { GoogleOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { loginUser, getGoogleLoginUrl } from "@/services/api/auth";
 
@@ -16,40 +15,25 @@ interface LoginFormValues {
 const LoginForm: React.FC = () => {
   const onFinish = useCallback(async (values: LoginFormValues) => {
     try {
-      // 로그인 API 호출
       const accessToken = await loginUser(values.username, values.password);
-
-      // Access Token을 로컬 스토리지에 저장
       window.localStorage.setItem("access", accessToken);
       message.success("로그인 성공!");
-
-      // 로그인 성공 후 리다이렉트
       window.location.href = "/dashboard";
     } catch (error) {
       console.error("로그인 오류:", error);
-      if (error instanceof Error) {
-        message.error(error.message || "로그인 실패! 사용자 이름 또는 비밀번호를 확인해주세요.");
-      } else {
-        message.error("알 수 없는 오류가 발생했습니다.");
-      }
+      message.error(error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.");
     }
   }, []);
 
-  const onFinishFailed = useCallback((errorInfo: unknown) => {
-    console.error("실패:", errorInfo);
-    message.error("로그인 양식을 확인해주세요.");
+  const onFinishFailed = useCallback(() => {
+    message.error("로그인 정보를 다시 확인해주세요.");
   }, []);
 
-  // Google 로그인 URL 요청 및 리다이렉트
   const handleGoogleLogin = useCallback(async () => {
     try {
       const googleLoginUrl = await getGoogleLoginUrl();
-
-      if (googleLoginUrl) {
-        window.location.href = googleLoginUrl;
-      } else {
-        message.error("Google 로그인 URL을 가져올 수 없습니다.");
-      }
+      if (googleLoginUrl) window.location.href = googleLoginUrl;
+      else message.error("Google 로그인 URL을 가져올 수 없습니다.");
     } catch {
       message.error("Google 로그인 요청 실패!");
     }
@@ -61,30 +45,16 @@ const LoginForm: React.FC = () => {
         <Image src="/logo.svg" alt="Logo" width={100} height={100} />
         <Title level={4}>Sign in to your account</Title>
         <Text>
-          Not a member? <Link href="/register">Start a 14-day free trial</Link>
+          Not a member? <Link href="/register">Start a 14 dat free trial</Link>
         </Text>
       </div>
 
-      <Form
-        name="login"
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        layout="vertical"
-      >
-        <Form.Item
-          label="Username"
-          name="username"
-          rules={[{ required: true, message: "Please input your username!" }]}
-        >
+      <Form name="login" initialValues={{ remember: true }} onFinish={onFinish} onFinishFailed={onFinishFailed} layout="vertical">
+        <Form.Item label="Username" name="username" rules={[{ required: true, message: "Please enter your username!" }]}>
           <Input placeholder="Enter your username" />
         </Form.Item>
 
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[{ required: true, message: "Please input your password!" }]}
-        >
+        <Form.Item label="Password" name="password" rules={[{ required: true, message: "Please enter your password!" }]}>
           <Input.Password placeholder="Enter your password" />
         </Form.Item>
 
@@ -96,31 +66,30 @@ const LoginForm: React.FC = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
-            Sign in
+          <Button type="primary" htmlType="submit" block style={{ backgroundColor: "#000", borderColor: "#000" }}>
+            Sign In
           </Button>
         </Form.Item>
       </Form>
 
-      <Divider>Or continue with</Divider>
-      <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-        <Button icon={<GoogleOutlined />} size="large" block onClick={handleGoogleLogin}>
-          Google
-        </Button>
+      <Divider>Or sign in with</Divider>
+      <div style={{ display: "flex", justifyContent: "center" }}>
         <Button
-          icon={
-            <Image
-              src="/kakao-icon.svg"
-              alt="Kakao"
-              width={20}
-              height={20}
-            />
-          }
           size="large"
           block
-          style={{ backgroundColor: "#FEE500", color: "#000" }}
+          onClick={handleGoogleLogin}
+          style={{
+            backgroundColor: "white",
+            color: "black",
+            borderColor: "#000",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+          }}
         >
-          Kakao
+          <Image src="/assets/google.svg" alt="Google" width={20} height={20} />
+          Google
         </Button>
       </div>
     </div>
