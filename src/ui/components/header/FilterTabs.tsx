@@ -37,7 +37,7 @@ const FilterTabs = () => {
         <button
           className="text-sm px-4 py-2 rounded-full transition"
           style={{
-            backgroundColor: currentPath === "/product/category" ? "var(--bg-black)" : "transparent",
+            backgroundColor: currentPath === "/product/category" ? "var(--icon-dark-gray)" : "transparent",
             color: currentPath === "/product/category" ? "var(--text-white)" : "var(--text-black)",
           }}
         >
