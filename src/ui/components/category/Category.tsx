@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { categories, subCategories } from "@/data/categories";
+import Image from "next/image";
 
 const CategoryPage = () => {
   const router = useRouter();
@@ -107,11 +108,13 @@ const CategoryPage = () => {
                     <div key={item.code} className="flex flex-col items-center cursor-pointer" onClick={() => router.push(`/product/category/${category.code}${item.code}?gf=${getGenderFilter()}`)}>
                       <div className="w-16 h-16 rounded overflow-hidden flex justify-center items-center">
                         {/*이미지가 없을 경우 기본 이미지로 대체 */}
-                        <img
+                        <Image
                           src={imagePath}
                           alt={item.name}
-                          className="w-full h-full object-contain"
-                          onError={(e) => (e.currentTarget.src = "/assets/category/default.svg")}
+                          width={64}
+                          height={64}
+                          className="object-contain"
+                          onError={(e) => e.currentTarget.src = "/assets/category/default.svg"}
                         />
                       </div>
                       <p className="text-xs mt-2 text-center" style={{

@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import styles from "./ProductCard.module.css";
+import Image from "next/image";
+
 
 interface Product {
   id: number;
@@ -26,7 +28,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className={styles.productCard}>
       {/* 상품 이미지 */}
       <div className={styles.productImage}>
-        <img src={product.imageUrl} alt={product.name} className={styles.image} />
+        <Image 
+          src={product.imageUrl} 
+          alt={product.name} 
+          width={200} // 적절한 크기로 변경 (원본 해상도 고려)
+          height={200} 
+          className={styles.image} 
+          priority // 중요 이미지 최적화
+        />
         <button className={styles.favoriteBtn} onClick={toggleFavorite}>
           {isFavorite ? (
             <HeartFilled className={styles.heartIconFilled} />
