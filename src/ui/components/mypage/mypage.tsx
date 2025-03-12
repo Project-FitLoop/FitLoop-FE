@@ -1,102 +1,125 @@
 "use client";
 import React from "react";
-import { Card, Button, Carousel } from "antd";
-import { SettingOutlined } from "@ant-design/icons";
-import styles from "./mypage.module.css";
 import { useRouter } from "next/navigation";
+import { Card, Typography, Button, List, Space, Image, Carousel } from "antd";
+import { SettingOutlined } from "@ant-design/icons";
+import BackButton from "@/ui/components/common/BackButton";
+
+const { Title, Text } = Typography;
 
 const MyPage: React.FC = () => {
   const router = useRouter();
+
+  // S3 광고 배너 이미지 경로
+  const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL ?? "";
+  const banners = Array.from({ length: 5 }, (_, i) => `${s3BaseUrl}advertisement_${i + 1}.png`);
+
   return (
-    <div className={`${styles.container} bg-[#F8F8F8] min-h-screen`}>
-      {/* 상단 헤더 */}
-      <div className="relative flex items-center mb-4 px-2">
-        <h1 className="text-lg font-bold text-[#333] flex-1">마이페이지</h1>
-        <SettingOutlined
-          className="text-2xl text-[#999] cursor-pointer"
-          onClick={() => router.push("/settings")}
-        />
-      </div>
-
-
-      {/* 유저 인사 */}
-      <div className="text-lg text-[#666] mb-4">빵순이님, 안녕하세요 :)</div>
-
-      {/* 혜택 카드 (회색 배경) */}
-      <Card className="flex items-center justify-between bg-[#F2F3F5] border-none p-3 rounded-lg">
-        <div className="flex items-center space-x-3">
-          <img src="/assets/sprout.png" alt="새싹" className="w-10 h-10 rounded-full" />
-          <div className="flex flex-col">
-            <span className="font-bold text-sm text-[#333]">새싹</span>
-            <span className="text-xs text-[#666]">마일리지 1.5% 적립 & 쿠폰팩</span>
+    <div className="max-w-[400px] mx-auto p-0 bg-[var(--bg-gray)] min-h-screen pb-[60px] overflow-auto">
+      {/* 마이페이지 ~ 구매내역 */}
+      <div className="bg-[var(--bg-white)] p-4">
+        {/* 상단 네비게이션 */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <BackButton />
+            <Title level={4} className="m-0 text-[var(--text-black)]">마이페이지</Title>
           </div>
-        </div>
-        <Button className="text-xs bg-[#EDEDED] text-[#333] px-3 py-1 rounded-full border border-[#E0E0E0]">
-            혜택 보기
-        </Button>
-      </Card>
 
-      {/*구매/판매/리뷰/포인트 - 가로 정렬 유지 */}
-      <div className={`${styles.statsContainer} grid grid-cols-5 text-center text-[#333] text-sm mb-6`}>
-        <div>
-          <div className="font-bold text-lg">3</div>
-          <div className="text-[#999] text-xs">구매내역</div>
+          <SettingOutlined
+            className="text-[var(--icon-black)] text-lg cursor-pointer"
+            onClick={() => router.push("/settings")}
+          />
         </div>
-        <div>
-          <div className="font-bold text-lg">1</div>
-          <div className="text-[#999] text-xs">판매내역</div>
+
+        {/* 사용자 정보 */}
+        <div className="mt-4">
+          <Text strong className="text-[var(--text-black)]">빵순이님, 안녕하세요 :)</Text>
         </div>
-        <div>
-          <div className="font-bold text-lg">2</div>
-          <div className="text-[#999] text-xs">리뷰</div>
-        </div>
-        <div>
-          <div className="font-bold text-lg">3</div>
-          <div className="text-[#999] text-xs">쿠폰</div>
-        </div>
-        <div>
-          <div className="font-bold text-lg">1,000p</div>
-          <div className="text-[#999] text-xs">포인트</div>
-        </div>
+
+        {/* 멤버십 카드 */}
+        <Card
+          className="mt-4 bg-[var(--bg-dark-gray)] rounded-xl"
+          styles={{
+            body: { display: "flex", alignItems: "center", justifyContent: "space-between" },
+          }}
+        >
+          <div className="flex items-center">
+            <Image src="/assets/sprout.png" alt="새싹" width={40} preview={false} />
+            <div className="ml-2">
+              <Text strong className="text-[var(--text-black)]">새싹</Text>
+              <br />
+              <Text className="text-[var(--text-gray)] text-xs">
+                마일리지 1.5% 적립 & 쿠폰팩
+              </Text>
+            </div>
+          </div>
+          <Button className="bg-white text-black border border-gray-300 hover:bg-gray-100 transition" size="small">
+            혜택 보기
+          </Button>
+        </Card>
+
+        {/* 사용자 데이터 */}
+        <Card className="mt-4">
+          <Space size="large" wrap={false}>
+            {[
+              { label: "구매내역", value: "34" },
+              { label: "판매내역", value: "100" },
+              { label: "리뷰", value: "3" },
+              { label: "쿠폰", value: "5" },
+              { label: "포인트", value: "1,000p" },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <Text className="text-[var(--text-gray)] text-xs">{label}</Text>
+                <br />
+                <Text strong className="text-[var(--text-black)] text-sm">{value}</Text>
+              </div>
+            ))}
+          </Space>
+        </Card>
       </div>
 
-      {/* 회색 구분선 */}
-      <div className={styles.divider} />
-
-      {/* 광고 배너 (Carousel) */}
-      <div className={styles.carouselWrapper}>
-        <Carousel autoplay className={styles.carousel} dots={{ className: styles.dots }}>
-          {["advertisement", "business", "marketing"].map((category, index) => (
-            <div key={index} className={styles.banner}>
-              <img
-                src={`https://source.unsplash.com/400x150/?${category}`}
-                alt={`광고 배너 ${index + 1}`}
-                className={styles.bannerImage}
+      {/* 광고 배너 (Carousel 적용, S3 이미지 사용) */}
+      <div className="mt-4 max-h-[250px] overflow-hidden">
+        <Carousel autoplay dots>
+          {banners.map((banner, index) => (
+            <div key={index}>
+              <Image
+                src={banner}
+                alt={`광고 ${index + 1}`}
+                width="100%"
+                height="auto"
+                preview={false}
+                className="object-cover max-h-[250px]"
               />
             </div>
           ))}
         </Carousel>
       </div>
 
-      {/* 회색 구분선 */}
-      <div className={styles.divider} />
+      {/* 최근 본 상품 */}
+      <Card className="mt-4 text-center h-[400px] rounded-none">
+        <Text className="text-[var(--text-gray)]">최근 본 상품</Text>
+      </Card>
 
       {/* 사업자 정보 */}
-      <Card className={`${styles.card} bg-white`}>
-        <div className="text-md font-bold mb-2 text-[#333]">(주) 핏루프 사업자 정보</div>
-        <div className="text-sm text-[#666] mb-1">
-          <span className="font-bold">대표이사</span> 곽지은
-        </div>
-        <div className="text-sm text-[#666] mb-1">
-          <span className="font-bold">주소</span> 경기도 성남시 분당구 판교역로
-        </div>
-        <div className="text-sm text-[#666] mb-1">
-          <span className="font-bold">문의 전화</span> 02-1234-5678
-        </div>
-        <div className="text-sm text-[#666]">
-          <span className="font-bold">이메일</span> fitloop@gmail.com
-        </div>
-      </Card>
+      <div className="mt-4 p-4">
+        <Title level={5} className="mb-2 text-[var(--text-black)]">
+          (주) 핏루프 사업자 정보
+        </Title>
+        <List size="small">
+          {[
+            { label: "대표이사", value: "곽지은" },
+            { label: "주소", value: "경기도 성남시 분당구 판교역로" },
+            { label: "문의 전화", value: "02-1234-5678" },
+            { label: "이메일", value: "fitloop@gmail.com" },
+          ].map(({ label, value }) => (
+            <List.Item key={label} className="flex min-w-0">
+              <Text className="text-[var(--text-gray)]">{label}</Text>
+              <Text className="ml-2 text-[var(--text-black)] truncate">{value}</Text>
+            </List.Item>
+          ))}
+        </List>
+      </div>
     </div>
   );
 };
