@@ -1,17 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import BackButton from "@/ui/components/common/BackButton";
 
-
 const Header = () => {
-  const router = useRouter();
 
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-white shadow-md">
       <BackButton/>
-
       <div className="flex space-x-4">
         <button>
           <Image src="/assets/product-tab/search.svg" alt="검색" width={20} height={20} />
