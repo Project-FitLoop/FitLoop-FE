@@ -8,7 +8,7 @@ import { registerInfomation } from "@/services/api/user";
 const { Text, Title } = Typography;
 
 const steps = [
-  { title: "닉네임을\n입력해 주세요.", field: "nickname", placeholder: "예: user123" },
+  { title: "닉네임을\n입력해 주세요.", field: "nickname", placeholder: "예: 닉네임" },
   { title: "성별을\n선택해 주세요.", field: "gender", type: "select", options: ["남자", "여자"] },
   { title: "연령대를\n선택해 주세요.", field: "ageRange", type: "select", options: ["10대", "20대", "30대", "40대", "50대", "60대", "70대", "80대"] },
   { title: "키를\n입력해 주세요.", field: "height", placeholder: "예: 170" },
@@ -26,7 +26,7 @@ interface InformationFormValues {
 const validationRules: Record<string, Rule[]> = {
   nickname: [
     { required: true, message: "닉네임을 입력해 주세요." },
-    { pattern: /^[a-zA-Z0-9_-]{3,16}$/, message: "닉네임은 3~16자의 영문, 숫자, -, _만 가능합니다." }
+    { pattern: /^[a-zA-Z0-9가-힣_-]{3,16}$/, message: "닉네임은 3~16자의 영문, 한글, 숫자, -, _만 가능합니다." }
   ],
   gender: [{ required: true, message: "성별을 선택해 주세요." }],
   ageRange: [{ required: true, message: "연령대를 선택해 주세요." }],
