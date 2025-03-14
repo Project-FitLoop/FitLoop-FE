@@ -5,7 +5,7 @@ const PersonInfoPage: React.FC = () => {
   return (
     <div
       style={{
-        height: "80vh",
+        height: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
