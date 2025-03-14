@@ -25,14 +25,23 @@ export const registerInfomation = async (
   height: number,
   weight: number
 ): Promise<boolean> => {
+  const accessToken = localStorage.getItem("access");
+
+  if (!accessToken) {
+    alert("Access Token이 없습니다. 로그인해주세요.");
+    window.location.href = "/login";
+    return false;
+  }
+
   try {
-    const response = await instance.post("/users/profile", {
-      nickname,
-      gender,
-      ageRange,
-      height,
-      weight,
-    });
+    const response = await instance.post("/users/profile", 
+      { nickname, gender, ageRange, height, weight },
+      {
+        headers: {
+          access: `${accessToken}`, // JWT 토큰 전송
+        },
+      }
+    );
 
     return response.status === 201; // 성공 시 true 반환
   } catch (error) {
