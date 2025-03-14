@@ -14,7 +14,7 @@ export const loginUser = async (username: string, password: string
     );
 
     // 응답 데이터에서 personal_info 가져오기
-    const { personal_info } = response.data;
+    const { personalInfo } = response.data;
     //응답 헤더에서 Access Token 추출
     const accessToken = response.headers["access"];
     if (!accessToken) {
@@ -22,7 +22,7 @@ export const loginUser = async (username: string, password: string
     }
 
     //Access Token 반환
-    return { accessToken, personalInfo: personal_info };
+    return { accessToken, personalInfo: personalInfo };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error("로그인 실패:", error.response?.data?.message || error.message);
