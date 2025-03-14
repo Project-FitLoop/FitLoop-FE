@@ -15,10 +15,11 @@ interface LoginFormValues {
 const LoginForm: React.FC = () => {
   const onFinish = useCallback(async (values: LoginFormValues) => {
     try {
-      const accessToken = await loginUser(values.username, values.password);
+      const { accessToken, personalInfo } = await loginUser(values.username, values.password);
       window.localStorage.setItem("access", accessToken);
       message.success("로그인 성공!");
-      window.location.href = "/dashboard";
+      // personal_info 값에 따라 이동
+      window.location.href = personalInfo ? "/mypage" : "/personinfo";
     } catch (error) {
       console.error("로그인 오류:", error);
       message.error(error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.");
