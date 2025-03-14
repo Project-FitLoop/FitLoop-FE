@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Form, Input, Button, Select, Progress, Typography } from "antd";
 import type { Rule } from "antd/es/form";
 import { registerInfomation } from "@/services/api/user";
+import { useRouter } from "next/navigation";
 
 const { Text, Title } = Typography;
 
@@ -44,6 +45,7 @@ const Information: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formValues, setFormValues] = useState<Partial<InformationFormValues>>({});
   const [form] = Form.useForm();
+  const router = useRouter();
 
   const handleNext = async () => {
     try {
@@ -63,6 +65,7 @@ const Information: React.FC = () => {
           updatedValues.weight!
         );
         alert("프로필 작성이 완료되었습니다!");
+        router.push("/dashboard");
       }
     } catch (error) {
       console.log("Validation Failed:", error);
