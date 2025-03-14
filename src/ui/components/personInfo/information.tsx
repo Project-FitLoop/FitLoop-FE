@@ -1,10 +1,20 @@
 "use client";
 
-import React from "react";
-import { Card, Form, Input, Button, Select } from "antd";
+import React, { useState } from "react";
+import { Form, Input, Button, Select, Progress, Typography } from "antd";
 import type { Rule } from "antd/es/form";
+import { registerInfomation } from "@/services/api/user";
 
-// 개인정보 입력 폼 값 인터페이스 정의
+const { Text, Title } = Typography;
+
+const steps = [
+  { title: "닉네임을\n입력해 주세요.", field: "nickname", placeholder: "예: user123" },
+  { title: "성별을\n선택해 주세요.", field: "gender", type: "select", options: ["남자", "여자"] },
+  { title: "연령대를\n선택해 주세요.", field: "ageRange", type: "select", options: ["10대", "20대", "30대", "40대", "50대", "60대", "70대", "80대"] },
+  { title: "키를\n입력해 주세요.", field: "height", placeholder: "예: 170" },
+  { title: "몸무게를\n입력해 주세요.", field: "weight", placeholder: "예: 65" }
+];
+
 interface InformationFormValues {
   nickname: string;
   gender: string;
@@ -13,14 +23,10 @@ interface InformationFormValues {
   weight: string;
 }
 
-// 유효성 검사 규칙 정의
-const validationRules: Record<keyof InformationFormValues, Rule[]> = {
+const validationRules: Record<string, Rule[]> = {
   nickname: [
     { required: true, message: "닉네임을 입력해 주세요." },
-    {
-      pattern: /^[a-zA-Z0-9_-]{3,16}$/,
-      message: "닉네임은 3~16자 이내의 영문, 숫자, -, _만 가능합니다."
-    }
+    { pattern: /^[a-zA-Z0-9_-]{3,16}$/, message: "닉네임은 3~16자의 영문, 숫자, -, _만 가능합니다." }
   ],
   gender: [{ required: true, message: "성별을 선택해 주세요." }],
   ageRange: [{ required: true, message: "연령대를 선택해 주세요." }],
@@ -34,29 +40,40 @@ const validationRules: Record<keyof InformationFormValues, Rule[]> = {
   ]
 };
 
-// 성별 선택 옵션
-const genderOptions = [
-  { value: "남자", label: "남자" },
-  { value: "여자", label: "여자" }
-];
-
-// 연령대 선택 옵션
-const ageRangeOptions = [
-  { value: "10대", label: "10대" },
-  { value: "20대", label: "20대" },
-  { value: "30대", label: "30대" },
-  { value: "40대", label: "40대" },
-  { value: "50대", label: "50대" },
-  { value: "60대", label: "60대" },
-  { value: "70대", label: "70대" },
-  { value: "80대", label: "80대" }
-];
-
 const Information: React.FC = () => {
-  // 폼 제출 시 호출되는 핸들러
-  const onFinish = async (values: InformationFormValues): Promise<void> => {
-    console.log(values);
-    alert("회원가입이 완료되었습니다!");
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formValues, setFormValues] = useState<Partial<InformationFormValues>>({});
+  const [form] = Form.useForm();
+
+  const handleNext = async () => {
+    try {
+      const values = await form.validateFields();
+      const updatedValues = { ...formValues, ...values };
+      setFormValues(updatedValues);
+
+      if (currentStep < steps.length - 1) {
+        setCurrentStep((prev) => prev + 1);
+        form.resetFields();
+      } else {
+        await registerInfomation(
+          updatedValues.nickname!,
+          updatedValues.gender!,
+          updatedValues.ageRange!,
+          updatedValues.height!,
+          updatedValues.weight!
+        );
+        alert("프로필 작성이 완료되었습니다!");
+      }
+    } catch (error) {
+      console.log("Validation Failed:", error);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+      form.setFieldsValue(formValues);
+    }
   };
 
   return (
@@ -68,72 +85,131 @@ const Information: React.FC = () => {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
-        backgroundColor: "#fff",
+        justifyContent: "space-between",
+        backgroundColor: "var(--bg-white)",
       }}
     >
-      <Card title="개인정보 입력" bordered={false}>
-        <Form
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            nickname: "",
-            gender: "",
-            ageRange: "",
-            height: "",
-            weight: ""
+      {/* 상단 진행 상황 */}
+      <div style={{ padding: "20px 16px" }}>
+        <Progress
+          percent={(currentStep + 1) * (100 / steps.length)}
+          showInfo={false}
+          strokeColor="var(--border-gray)"
+          trailColor="var(--border-light-gray)"
+          style={{
+            width: "100%",
+            height: 8,
+            marginBottom: 24,
+          }}
+        />
+
+        {/* 단계 번호와 제목 */}
+        <div style={{ marginTop: 16 }}>
+          <Text
+            style={{
+              fontSize: 14,
+              color: "var(--text-gray)",
+              display: "block",
+              marginBottom: 8,
+            }}
+          >
+            {`${currentStep + 1}/${steps.length}`}
+          </Text>
+          <Title
+            level={5}
+            style={{
+              margin: 0,
+              fontWeight: 600,
+              fontSize: 20,
+              lineHeight: "1.5",
+              color: "var(--text-black)",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {steps[currentStep].title}
+          </Title>
+        </div>
+      </div>
+
+      {/* 입력 필드 */}
+      <Form
+        form={form}
+        onFinish={handleNext}
+        style={{
+          width: "100%",
+          padding: "0 16px",
+        }}
+        initialValues={formValues}
+      >
+        <Form.Item
+          name={steps[currentStep].field}
+          rules={validationRules[steps[currentStep].field as keyof InformationFormValues]}
+          style={{ marginBottom: 40 }}
+        >
+          {steps[currentStep].type === "select" ? (
+            <Select
+              placeholder={steps[currentStep].title}
+              options={steps[currentStep].options?.map((option) => ({
+                value: option,
+                label: option,
+              }))}
+              size="large"
+            />
+          ) : (
+            <Input
+              placeholder={steps[currentStep].placeholder}
+              size="large"
+              style={{
+                border: "none",
+                borderBottom: "1px solid var(--border-light-gray)",
+                borderRadius: 0,
+                padding: "8px 0",
+                fontSize: 16,
+              }}
+            />
+          )}
+        </Form.Item>
+      </Form>
+
+      {/* 하단 버튼 */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: currentStep > 0 ? "space-between" : "center",
+          padding: "0 16px",
+        }}
+      >
+        {currentStep > 0 && (
+          <Button
+            style={{
+              width: "calc(50% - 8px)",
+              height: 48,
+              backgroundColor: "var(--bg-gray)",
+              border: "1px solid var(--border-gray)",
+              fontSize: 16,
+              fontWeight: 600,
+            }}
+            onClick={handlePrevious}
+          >
+            이전
+          </Button>
+        )}
+        <Button
+          type="primary"
+          onClick={() => form.submit()}
+          style={{
+            width: currentStep > 0 ? "calc(50% - 8px)" : "100%",
+            height: 48,
+            backgroundColor: "var(--text-black)",
+            border: "none",
+            color: "var(--text-white)",
+            fontSize: 16,
+            fontWeight: 600,
           }}
         >
-          <Form.Item
-            label="닉네임"
-            name="nickname"
-            rules={validationRules.nickname}
-          >
-            <Input placeholder="예: user123" size="large" />
-          </Form.Item>
-          <Form.Item
-            label="성별"
-            name="gender"
-            rules={validationRules.gender}
-          >
-            <Select
-              placeholder="성별 선택"
-              size="large"
-              options={genderOptions}
-            />
-          </Form.Item>
-          <Form.Item
-            label="연령대"
-            name="ageRange"
-            rules={validationRules.ageRange}
-          >
-            <Select
-              placeholder="연령대 선택"
-              size="large"
-              options={ageRangeOptions}
-            />
-          </Form.Item>
-          <Form.Item
-            label="키 (cm)"
-            name="height"
-            rules={validationRules.height}
-          >
-            <Input placeholder="예: 170" size="large" />
-          </Form.Item>
-          <Form.Item
-            label="몸무게 (kg)"
-            name="weight"
-            rules={validationRules.weight}
-          >
-            <Input placeholder="예: 65" size="large" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block size="large">
-              완료
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
+          {currentStep === steps.length - 1 ? "완료" : "다음"}
+        </Button>
+      </div>
     </div>
   );
 };
