@@ -14,8 +14,13 @@ const FloatingActionButton: React.FC = () => {
   }, []);
 
   const scrollToTop = () => {
-    if (scrollElement) {
-      scrollElement.scrollTo({ top: 0, behavior: "smooth" });
+    const myPageContainer = document.getElementById("myPageContainer");
+
+    if (myPageContainer) {
+      myPageContainer.scrollTop = 0;
+      myPageContainer.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
