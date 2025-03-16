@@ -28,7 +28,7 @@ const ProductRegisterForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md w-full bg-white p-6 pb-24">
+    <div className="max-w-md w-full bg-white p-6 pb-16">
       {/* 제목 */}
       <h2 className="text-lg font-semibold text-gray-900 text-center mb-4">상품 1 설정</h2>
       <hr className="border-gray-300 mb-4" />
