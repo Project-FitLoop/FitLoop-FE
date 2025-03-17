@@ -1,15 +1,15 @@
 "use client"
 import React, { useState } from "react";
+import { categories, subCategories } from "@/data/categories";
 
 const ProductRegisterForm: React.FC = () => {
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
+  const [subCategory, setSubCategory] = useState("");
   const [price, setPrice] = useState("");
   const [isFree, setIsFree] = useState(false);
   const [includeShipping, setIncludeShipping] = useState(false);
   const [image, setImage] = useState<string | null>(null);
-  const [productCondition, setProductCondition] = useState("");
-  const [usedCondition, setUsedCondition] = useState("");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -46,18 +46,42 @@ const ProductRegisterForm: React.FC = () => {
         />
       </div>
 
-      {/* 카테고리 */}
+      {/* 대 카테고리 */}
       <div className="mb-4">
-        <label className="text-gray-700 text-sm font-medium">카테고리</label>
+        <label className="text-gray-700 text-sm font-medium">대 카테고리</label>
         <select
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            setSubCategory(""); // 중 카테고리 초기화
+          }}
           className="w-full p-3 border rounded-md mt-1 text-sm text-gray-900"
         >
-          <option value="">카테고리 선택</option>
-          <option value="electronics">전자기기</option>
-          <option value="fashion">패션</option>
-          <option value="home">홈 & 리빙</option>
+          <option value="">대 카테고리 선택</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 중 카테고리 */}
+      <div className="mb-4">
+        <label className="text-gray-700 text-sm font-medium">중 카테고리</label>
+        <select
+          value={subCategory}
+          onChange={(e) => setSubCategory(e.target.value)}
+          className="w-full p-3 border rounded-md mt-1 text-sm text-gray-900"
+          disabled={!category}
+        >
+          <option value="">중 카테고리 선택</option>
+          {category &&
+            subCategories[category]?.map((sub) => (
+              <option key={sub.code} value={sub.code}>
+                {sub.name}
+              </option>
+            ))}
         </select>
       </div>
 
@@ -134,9 +158,9 @@ const ProductRegisterForm: React.FC = () => {
       {/* 저장 버튼 */}
       <button
         className={`w-full p-3 text-white rounded-md font-medium ${
-          productName && category && price ? "bg-black" : "bg-gray-400"
+          productName && category && subCategory && price ? "bg-black" : "bg-gray-400"
         }`}
-        disabled={!productName || !category || !price}
+        disabled={!productName || !category || !subCategory || !price}
       >
         저장하기
       </button>
