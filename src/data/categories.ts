@@ -10,17 +10,17 @@ export const categories = [
     { name: "패션 소품", id: "fashionAccessories", code: "008", gender: "all" },
   ];
   
-  // 중분류
-  export const subCategories: { [key: string]: { name: string; code: string }[] } = {
+// 중분류
+export const subCategories: { [key: string]: { name: string; code: string }[] } = {
     shoes: [
-      { name: "스니커즈", code: "001" },
-      { name: "패딩/퍼 신발", code: "002" },
-      { name: "부츠/워커", code: "003" },
-      { name: "구두", code: "004" },
-      { name: "샌들/슬리퍼", code: "005" },
-      { name: "스포츠화", code: "006" },
-      { name: "신발용품", code: "007" },
-      { name: "기타", code: "008" }
+        { name: "스니커즈", code: "001" },
+        { name: "패딩/퍼 신발", code: "002" },
+        { name: "부츠/워커", code: "003" },
+        { name: "구두", code: "004" },
+        { name: "샌들/슬리퍼", code: "005" },
+        { name: "스포츠화", code: "006" },
+        { name: "신발용품", code: "007" },
+        { name: "기타", code: "008" }
     ],
     outerwear: [
         { name: "숏패딩/헤비아우터", code: "001" },
