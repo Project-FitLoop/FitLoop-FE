@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
 import { Modal } from "antd";
 import { ExclamationCircleOutlined, RightOutlined } from "@ant-design/icons";
+import { registerProduct } from "@/services/api/productRegister";
 
 const ProductRegisterForm: React.FC = () => {
   const [productName, setProductName] = useState("");
@@ -34,11 +35,6 @@ const ProductRegisterForm: React.FC = () => {
     }
   };
 
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPrice(e.target.value);
-    if (e.target.value === "") setIsFree(false);
-  };
-
   const handleFreeClick = () => {
     if (isFree) {
       setIsFree(false);
@@ -51,12 +47,48 @@ const ProductRegisterForm: React.FC = () => {
 
   const handleRemoveImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
-
-    // 파일 입력 필드 초기화
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   }; 
+
+  const handleSave = async () => {
+    if (!productName || !category || !subCategory || !price) {
+      alert("모든 필수 정보를 입력해주세요.");
+      return;
+    }
+  
+    const formData = {
+      productName,
+      category,
+      subCategory,
+      price: isFree ? 0 : parseInt(price, 10),
+      isFree,
+      includeShipping,
+      images, // 이미지 URL 리스트
+      productCondition,
+      usedCondition: productCondition === "중고" ? usedCondition : null,
+      productDescription,
+    };
+  
+    try {
+      const response = await registerProduct(formData);
+      alert("상품이 성공적으로 등록되었습니다.");
+  
+      setProductName("");
+      setCategory("");
+      setSubCategory("");
+      setPrice("");
+      setIsFree(false);
+      setIncludeShipping(false);
+      setImages([]);
+      setProductCondition("");
+      setUsedCondition("");
+      setProductDescription("");
+    } catch (error) {
+      alert("상품 등록 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <div className="max-w-md w-full bg-[var(--bg-white)] p-6 pb-20">
@@ -158,7 +190,7 @@ const ProductRegisterForm: React.FC = () => {
               ${includeShipping ? "bg-[var(--bg-dark-gray)] " : "bg-[var(--bg-white)] border-[var(--border-light-gray)]"}`}
             onClick={() => setIncludeShipping(!includeShipping)}
           >
-            {includeShipping && <div className="w-2.5 h-2.5 bg-[var(--icon-white)] rounded-full"></div>}
+            {includeShipping && <div className="w-1.5 h-1.5 bg-[var(--icon-white)] rounded-full"></div>}
           </div>
           <span className={`ml-2 ${includeShipping ? "text-[var(--text-black)]" : "text-[var(--text-gray)]"}`}>
             배송비 포함
@@ -287,6 +319,7 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 저장 버튼 */}
       <button
+        onClick={handleSave}
         className={`w-full p-3 text-white rounded-md font-medium ${
           productName && category && subCategory && price ? "bg-black" : "bg-gray-400"
         }`}
