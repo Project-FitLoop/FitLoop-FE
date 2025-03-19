@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
 import { Modal } from "antd";
 import { ExclamationCircleOutlined, RightOutlined } from "@ant-design/icons";
@@ -21,6 +21,7 @@ const ProductRegisterForm: React.FC = () => {
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isUsedConditionModalOpen, setIsUsedConditionModalOpen] = useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,6 +30,7 @@ const ProductRegisterForm: React.FC = () => {
         URL.createObjectURL(file)
       );
       setImages([...images, ...uploadedFiles]);
+      e.target.value = "";
     }
   };
 
@@ -49,7 +51,12 @@ const ProductRegisterForm: React.FC = () => {
 
   const handleRemoveImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
-  };  
+
+    // 파일 입력 필드 초기화
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }; 
 
   return (
     <div className="max-w-md w-full bg-[var(--bg-white)] p-6 pb-20">
@@ -156,7 +163,7 @@ const ProductRegisterForm: React.FC = () => {
               />
               <button
                 onClick={() => handleRemoveImage(index)}
-                className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded-full"
+                className="absolute top-1 right-1 bg-[rgba(0,0,0,0.6)] text-white text-xs p-1 rounded-full hover:bg-[rgba(0,0,0,0.8)] transition"
               >
                 ✕
               </button>
