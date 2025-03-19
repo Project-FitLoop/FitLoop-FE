@@ -139,14 +139,17 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 배송비 포함 여부 */}
       <div className="mb-10">
-        <label className="text-[var(--text-gray)] text-sm font-medium flex items-center">
-          <input
-            type="checkbox"
-            checked={includeShipping}
-            onChange={() => setIncludeShipping(!includeShipping)}
-            className="mr-2"
-          />
-          배송비 포함
+        <label className="text-[var(--text-gray)] text-sm font-medium flex items-center cursor-pointer">
+          <div
+            className={`w-4 h-4 flex items-center justify-center rounded-full border 
+              ${includeShipping ? "bg-[var(--bg-dark-gray)] " : "bg-[var(--bg-white)] border-[var(--border-light-gray)]"}`}
+            onClick={() => setIncludeShipping(!includeShipping)}
+          >
+            {includeShipping && <div className="w-2.5 h-2.5 bg-[var(--icon-white)] rounded-full"></div>}
+          </div>
+          <span className={`ml-2 ${includeShipping ? "text-[var(--text-black)]" : "text-[var(--text-gray)]"}`}>
+            배송비 포함
+          </span>
         </label>
       </div>
 
