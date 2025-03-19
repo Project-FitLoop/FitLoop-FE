@@ -128,9 +128,9 @@ const ProductRegisterForm: React.FC = () => {
         />
         <button
           onClick={handleFreeClick}
-          className={`flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium ${
-            isFree ? "bg-gray-400 text-white" : "bg-gray-200 text-[var(--text-dark-gray)]"
-          }`}
+          className={`flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium border whitespace-nowrap
+            ${isFree ? "bg-[var(--bg-dark-gray)] text-[var(--text-white)] border-[var(--border-gray)]" 
+                    : "bg-[var(--bg-white)] text-[var(--text-dark-gray)] border-[var(--border-light-gray)]"}`}
           style={{ minWidth: "60px" }}
         >
           무료
