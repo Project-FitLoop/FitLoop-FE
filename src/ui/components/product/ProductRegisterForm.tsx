@@ -145,7 +145,7 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 상품 사진 (여러 장 가능) */}
       <div className="mb-10">
-      <label className="text-[var(--text-dark-gray)] text-lg font-semibold">사진</label>
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">사진</label>
         <div className="flex flex-wrap gap-2 mt-2">
           {images.map((src, index) => (
             <div key={index} className="relative w-24 h-24">
@@ -174,13 +174,14 @@ const ProductRegisterForm: React.FC = () => {
         <div>
           <label className="text-[var(--text-dark-gray)] text-lg font-semibold">상품상태</label>
           <div className="flex space-x-2 mt-2">
+
             {["미개봉", "거의 새 상품", "중고"].map((condition) => (
               <button
                 key={condition}
                 className={`px-4 py-2 rounded-md text-sm font-medium border 
                   ${
                     productCondition === condition
-                      ? "border-[var--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                      ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
                       : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
                   }`}
                 onClick={() => setProductCondition(condition)}
@@ -191,16 +192,19 @@ const ProductRegisterForm: React.FC = () => {
           </div>
         </div>
 
+        <div className="mt-2">
+          <div
+            className="text-sm text-[var(--text-gray)] cursor-pointer flex items-center"
+            onClick={() => setIsUsedConditionModalOpen(true)}
+          >
+              <ExclamationCircleOutlined className="mr-2" />
+                상품 상태 안내
+              <RightOutlined className="ml-auto" />
+          </div>
+        </div>
+
         {productCondition === "중고" && (
           <div className="mt-2">
-            <div
-              className="text-sm text-[var(--text-gray)] cursor-pointer flex items-center"
-              onClick={() => setIsUsedConditionModalOpen(true)}
-            >
-              <ExclamationCircleOutlined className="mr-2" />
-              추가 중고 상품 상태 안내
-              <RightOutlined className="ml-auto" />
-            </div>
 
             {/* 추가 중고 상품 상태 */}
             <div className="mt-6">
@@ -209,8 +213,10 @@ const ProductRegisterForm: React.FC = () => {
                 {["좋음", "보통", "나쁨"].map((condition) => (
                   <button
                     key={condition}
-                    className={`px-4 py-2 rounded-md text-sm font-medium ${
-                      usedCondition === condition ? "bg-gray-900 text-white" : "bg-gray-200 text-[var(--text-dark-gray)]"
+                    className={`px-4 py-2 rounded-md text-sm font-medium border ${
+                      usedCondition === condition                       
+                      ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                      : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
                     }`}
                     onClick={() => setUsedCondition(condition)}
                   >
@@ -293,8 +299,10 @@ const ProductRegisterForm: React.FC = () => {
       </Modal>
 
       {/* 추가 중고 상품 상태 모달 */}
-      <Modal title="추가 중고 상품 상태 안내" open={isUsedConditionModalOpen} onCancel={() => setIsUsedConditionModalOpen(false)} footer={null}>
-        <p>중고 상품의 상태를 정확하게 입력해주세요.</p>
+      <Modal title="추가 상품 안내" open={isUsedConditionModalOpen} onCancel={() => setIsUsedConditionModalOpen(false)} footer={null}>
+        <p>※ 상품의 상태를 정확하게 입력해주세요.</p>
+        <p>- 거의 새 상품: 사용하지 않고 포장만 개봉된 상태</p>
+        <p>※ 중고 상품의 경우</p>
         <p>- 좋음: 사용감이 적고 깨끗한 상태</p>
         <p>- 보통: 사용감이 있으나 기능상 문제 없음</p>
         <p>- 나쁨: 사용감이 크고 일부 흠집이 있을 수 있음</p>
