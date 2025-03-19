@@ -122,7 +122,20 @@ const ProductRegisterForm: React.FC = () => {
           type="number"
           placeholder="판매가격 입력"
           value={isFree ? "" : price}
-          onChange={handlePriceChange}
+          onChange={(e) => {
+            let value = e.target.value;
+            let numericValue = parseInt(value, 10);
+            if (isNaN(numericValue) || numericValue < 0) {
+              numericValue = 0;
+            }
+            setPrice(numericValue.toString());
+          }}
+          onBlur={() => {
+            let numericValue = parseInt(price, 10);
+            if (numericValue % 10 !== 0) {
+              setPrice("0");
+            }
+          }}
           disabled={isFree}
           className="w-full p-3 border border-[var(--border-light-gray)] rounded-md text-sm text-[var(--text-dark-gray)]"
         />
