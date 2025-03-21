@@ -116,8 +116,8 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 대 카테고리 */}
       <div className="mb-1">
-      <label className="text-[var(--text-dark-gray)] text-lg font-semibold">카테고리</label>
-      <select
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">카테고리</label>
+        <select
           value={category}
           onChange={(e) => {
             setCategory(e.target.value);
@@ -127,7 +127,7 @@ const ProductRegisterForm: React.FC = () => {
         >
           <option value="">카테고리 선택</option>
           {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
+            <option key={cat.id} value={cat.name}>
               {cat.name}
             </option>
           ))}
@@ -138,14 +138,16 @@ const ProductRegisterForm: React.FC = () => {
       <div className="mb-10">
         <select
           value={subCategory}
-          onChange={(e) => setSubCategory(e.target.value)}
+          onChange={(e) => setSubCategory(e.target.value)} // 이름 저장
           className="w-full p-3 border border-[var(--border-light-gray)] rounded-md mt-1 text-sm text-[var(--text-dark-gray)]"
           disabled={!category}
         >
           <option value="">상세 카테고리 선택</option>
           {category &&
-            subCategories[category]?.map((sub) => (
-              <option key={sub.code} value={sub.code}>
+            subCategories[
+              categories.find(cat => cat.name === category)?.id || ""
+            ]?.map((sub) => (
+              <option key={sub.code} value={sub.name}>
                 {sub.name}
               </option>
             ))}
@@ -292,13 +294,13 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 상품 설명 (사용자 입력 가능) */}
       <div className="mb-4">
-      <label className="text-[var(--text-dark-gray)] text-lg font-semibold">상품 설명</label>
+      <label className="text-[var(--text-black)] text-lg font-semibold">상품 설명</label>
         <textarea
-          placeholder="사이즈, 색상, 사용감, 사용기간, 브랜드명, 보증 기간 등 상세한 상품 정보를 입력하세요."
+          placeholder="사이즈, 색상, 사용감, 사용기간, 브랜드명, 보증 기간 등 상세한 상품 정보를 입력하면 더욱 수월하게 거래 할 수 있습니다"
           value={productDescription}
           onChange={(e) => setProductDescription(e.target.value)}
-          className="w-full p-3 border border-[var(--border-light-gray)] rounded-md mt-1 text-sm text-[var(--text-dark-gray)]"
-          style={{ minHeight: "120px" }} // 입력 가능하게 하고 크기 늘림
+          className="w-full p-3 border border-[var(--border-light-gray)] rounded-md mt-1 text-sm text-[var(--text-black)]"
+          style={{ minHeight: "120px" }}
         />
       </div>
 
