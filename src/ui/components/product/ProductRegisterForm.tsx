@@ -59,6 +59,8 @@ const ProductRegisterForm: React.FC = () => {
       return;
     }
   
+    const finalProductCondition = usedCondition || productCondition;
+  
     const formData = {
       productName,
       category,
@@ -66,9 +68,8 @@ const ProductRegisterForm: React.FC = () => {
       price: isFree ? 0 : parseInt(price, 10),
       isFree,
       includeShipping,
-      images, // 이미지 URL 리스트
-      productCondition,
-      usedCondition: productCondition === "중고" ? usedCondition : null,
+      images,
+      productCondition: finalProductCondition,
       productDescription,
     };
   
@@ -89,7 +90,7 @@ const ProductRegisterForm: React.FC = () => {
     } catch (error) {
       alert("상품 등록 중 오류가 발생했습니다.");
     }
-  };
+  };  
 
   return (
     <div className="max-w-md w-full bg-[var(--bg-white)] p-6 pb-20">
