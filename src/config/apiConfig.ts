@@ -7,6 +7,18 @@ const instance = axios.create({
   withCredentials: true, 
 });
 
+//모든 요청에 access 토큰 자동 포함
+instance.interceptors.request.use(
+  (config) => {
+    const accessToken = localStorage.getItem("access");
+    if (accessToken) {
+      config.headers["access"] = accessToken;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Access Token 자동 갱신 (Interceptor)
 instance.interceptors.response.use(
   (response) => response,
