@@ -38,7 +38,7 @@ const MyPage: React.FC = () => {
 
         {/* 멤버십 카드 */}
         <Card
-          className="mt-4 bg-[var(--bg-dark-gray)] rounded-xl"
+          className="mt-4 bg-[var(--bg-light-gray)] rounded-xl"
           styles={{
             body: { display: "flex", alignItems: "center", justifyContent: "space-between" },
           }}
