@@ -4,6 +4,7 @@ import { categories, subCategories } from "@/data/categories";
 import { Modal } from "antd";
 import { ExclamationCircleOutlined, RightOutlined } from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productRegister";
+import { uploadImages } from "@/services/api/imageUpload";
 import BackButton from "@/ui/components/common/BackButton";
 
 const ProductRegisterForm: React.FC = () => {
@@ -14,6 +15,7 @@ const ProductRegisterForm: React.FC = () => {
   const [isFree, setIsFree] = useState(false);
   const [includeShipping, setIncludeShipping] = useState(false);
   const [images, setImages] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [productCondition, setProductCondition] = useState("");
   const [usedCondition, setUsedCondition] = useState("");
   const [productDescription, setProductDescription] = useState("");
@@ -28,10 +30,12 @@ const ProductRegisterForm: React.FC = () => {
   
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const uploadedFiles = Array.from(e.target.files).map((file) =>
-        URL.createObjectURL(file)
-      );
-      setImages([...images, ...uploadedFiles]);
+      const files = Array.from(e.target.files);
+      const previews = files.map((file) => URL.createObjectURL(file));
+      
+      setImages((prev) => [...prev, ...previews]);
+      setImageFiles((prev) => [...prev, ...files]);
+  
       e.target.value = "";
     }
   };
@@ -47,18 +51,21 @@ const ProductRegisterForm: React.FC = () => {
   };
 
   const handleRemoveImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  }; 
+  };  
 
   const handleSave = async () => {
     if (!productName || !category || !subCategory || !price) {
       alert("모든 필수 정보를 입력해주세요.");
       return;
     }
-  
+
+    const uploadedUrls = await uploadImages(imageFiles);
     const finalProductCondition = usedCondition || productCondition;
   
     const formData = {
@@ -68,7 +75,7 @@ const ProductRegisterForm: React.FC = () => {
       price: isFree ? 0 : parseInt(price, 10),
       isFree,
       includeShipping,
-      images,
+      images: uploadedUrls ? "없음" : uploadedUrls,
       productCondition: finalProductCondition,
       productDescription,
     };
@@ -139,7 +146,7 @@ const ProductRegisterForm: React.FC = () => {
       <div className="mb-10">
         <select
           value={subCategory}
-          onChange={(e) => setSubCategory(e.target.value)} // 이름 저장
+          onChange={(e) => setSubCategory(e.target.value)}
           className="w-full p-3 border border-[var(--border-light-gray)] rounded-md mt-1 text-sm text-[var(--text-dark-gray)]"
           disabled={!category}
         >
