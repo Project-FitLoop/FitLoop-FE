@@ -4,6 +4,7 @@ import { categories, subCategories } from "@/data/categories";
 import { Modal } from "antd";
 import { ExclamationCircleOutlined, RightOutlined } from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productRegister";
+import BackButton from "@/ui/components/common/BackButton";
 
 const ProductRegisterForm: React.FC = () => {
   const [productName, setProductName] = useState("");
@@ -92,8 +93,12 @@ const ProductRegisterForm: React.FC = () => {
 
   return (
     <div className="max-w-md w-full bg-[var(--bg-white)] p-6 pb-20">
-      {/* 제목 */}
-      <h2 className="text-lg font-semibold text-[var(--text-black)] text-center mb-4">상품 1 설정</h2>
+      <div className="flex items-center gap-2 mb-4">
+        <BackButton />
+        <h2 className="text-lg font-semibold text-[var(--text-black)]">
+          상품 등록
+        </h2>
+      </div>
       <hr className="border-[var(--border-gray)] mb-4" />
 
       {/* 상품명 */}
