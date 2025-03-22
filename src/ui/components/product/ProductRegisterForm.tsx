@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
 import { Modal } from "antd";
@@ -6,6 +6,7 @@ import { ExclamationCircleOutlined, RightOutlined } from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productRegister";
 import { uploadImages } from "@/services/api/imageUpload";
 import BackButton from "@/ui/components/common/BackButton";
+import Image from "next/image";
 
 const ProductRegisterForm: React.FC = () => {
   const [productName, setProductName] = useState("");
@@ -19,6 +20,7 @@ const ProductRegisterForm: React.FC = () => {
   const [productCondition, setProductCondition] = useState("");
   const [usedCondition, setUsedCondition] = useState("");
   const [productDescription, setProductDescription] = useState("");
+  const [gender, setGender] = useState("");
   
   // 모달
   const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false);
@@ -60,7 +62,9 @@ const ProductRegisterForm: React.FC = () => {
   };  
 
   const handleSave = async () => {
-    if (!productName || !category || !subCategory || !price) {
+    if (!productName || !category || !subCategory || !price || 
+      !productCondition || !gender
+    ) {
       alert("모든 필수 정보를 입력해주세요.");
       return;
     }
@@ -75,26 +79,27 @@ const ProductRegisterForm: React.FC = () => {
       price: isFree ? 0 : parseInt(price, 10),
       isFree,
       includeShipping,
+      gender,
       images: uploadedUrls ? "없음" : uploadedUrls,
       productCondition: finalProductCondition,
       productDescription,
     };
   
     try {
-      const response = await registerProduct(formData);
+      await registerProduct(formData);
       alert("상품이 성공적으로 등록되었습니다.");
-  
       setProductName("");
       setCategory("");
       setSubCategory("");
       setPrice("");
       setIsFree(false);
       setIncludeShipping(false);
+      setGender("");
       setImages([]);
       setProductCondition("");
       setUsedCondition("");
       setProductDescription("");
-    } catch (error) {
+    } catch {
       alert("상품 등록 중 오류가 발생했습니다.");
     }
   };  
@@ -170,7 +175,7 @@ const ProductRegisterForm: React.FC = () => {
           placeholder="판매가격 입력"
           value={isFree ? "" : price}
           onChange={(e) => {
-            let value = e.target.value;
+            const value = e.target.value;
             let numericValue = parseInt(value, 10);
             if (isNaN(numericValue) || numericValue < 0) {
               numericValue = 0;
@@ -178,7 +183,7 @@ const ProductRegisterForm: React.FC = () => {
             setPrice(numericValue.toString());
           }}
           onBlur={() => {
-            let numericValue = parseInt(price, 10);
+            const numericValue = parseInt(price, 10);
             if (numericValue % 10 !== 0) {
               setPrice("0");
             }
@@ -188,9 +193,11 @@ const ProductRegisterForm: React.FC = () => {
         />
         <button
           onClick={handleFreeClick}
-          className={`flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium border whitespace-nowrap
-            ${isFree ? "bg-[var(--bg-dark-gray)] text-[var(--text-white)] border-[var(--border-gray)]" 
-                    : "bg-[var(--bg-white)] text-[var(--text-dark-gray)] border-[var(--border-light-gray)]"}`}
+          className={`flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium border whitespace-nowrap ${
+            isFree
+              ? "bg-[var(--bg-dark-gray)] text-[var(--text-white)] border-[var(--border-gray)]"
+              : "bg-[var(--bg-white)] text-[var(--text-dark-gray)] border-[var(--border-light-gray)]"
+          }`}
           style={{ minWidth: "60px" }}
         >
           무료
@@ -213,16 +220,39 @@ const ProductRegisterForm: React.FC = () => {
         </label>
       </div>
 
+      {/* 성별 */}
+      <div className="mb-10">
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">성별</label>
+        <div className="flex space-x-2 mt-2">
+          {["공용", "남성", "여성"].map((option) => (
+            <button
+              key={option}
+              className={`px-4 py-2 rounded-md text-sm font-medium border ${
+                gender === option
+                  ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                  : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+              }`}
+              onClick={() => setGender(option)}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* 상품 사진 (여러 장 가능) */}
       <div className="mb-10">
         <label className="text-[var(--text-dark-gray)] text-lg font-semibold">사진</label>
         <div className="flex flex-wrap gap-2 mt-2">
           {images.map((src, index) => (
             <div key={index} className="relative w-24 h-24">
-              <img 
-                src={src} 
-                alt="상품 이미지" 
-                className="w-full h-full object-cover rounded-md border border-[var(--border-light-gray)]"
+              <Image
+                src={src}
+                alt="상품 이미지"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-md border border-[var(--border-light-gray)]"
+                unoptimized
               />
               <button
                 onClick={() => handleRemoveImage(index)}
@@ -232,7 +262,7 @@ const ProductRegisterForm: React.FC = () => {
               </button>
             </div>
           ))}
-          <label className="w-24 h-24 flex items-center justify-center border border-[var(--border-light-gray)] rounded-md cursor-pointer text-[var(--text-gray)] text-sm">
+          <label className="w-24 h-24 flex items-center justify-center border border-[var(--border-light-gray)] rounded-md cursor-pointer text-[var(--text-gray)] text-sm relative">
             +
             <input type="file" accept="image/*" onChange={handleImageUpload} multiple className="hidden" />
           </label>
@@ -244,16 +274,14 @@ const ProductRegisterForm: React.FC = () => {
         <div>
           <label className="text-[var(--text-dark-gray)] text-lg font-semibold">상품상태</label>
           <div className="flex space-x-2 mt-2">
-
             {["미개봉", "중고"].map((condition) => (
               <button
                 key={condition}
-                className={`px-4 py-2 rounded-md text-sm font-medium border 
-                  ${
-                    productCondition === condition
-                      ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
-                      : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
-                  }`}
+                className={`px-4 py-2 rounded-md text-sm font-medium border ${
+                  productCondition === condition
+                    ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                    : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+                }`}                
                 onClick={() => setProductCondition(condition)}
               >
                 {condition}
@@ -267,26 +295,27 @@ const ProductRegisterForm: React.FC = () => {
             className="text-sm text-[var(--text-gray)] cursor-pointer flex items-center"
             onClick={() => setIsUsedConditionModalOpen(true)}
           >
-              <ExclamationCircleOutlined className="mr-2" />
-                상품 상태 안내
-              <RightOutlined className="ml-auto" />
+            <ExclamationCircleOutlined className="mr-2" />
+            상품 상태 안내
+            <RightOutlined className="ml-auto" />
           </div>
         </div>
 
         {productCondition === "중고" && (
           <div className="mt-2">
-
             {/* 추가 중고 상품 상태 */}
             <div className="mt-6">
-            <label className="text-[var(--text-dark-gray)] text-lg font-semibold">추가 중고 상품 상태</label>
+              <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+                추가 중고 상품 상태
+              </label>
               <div className="flex space-x-2 mt-2">
                 {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
                   <button
                     key={condition}
                     className={`px-4 py-2 rounded-md text-sm font-medium border ${
-                      usedCondition === condition                       
-                      ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
-                      : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+                      usedCondition === condition
+                        ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                        : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
                     }`}
                     onClick={() => setUsedCondition(condition)}
                   >
@@ -302,7 +331,9 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 상품 설명 (사용자 입력 가능) */}
       <div className="mb-4">
-      <label className="text-[var(--text-black)] text-lg font-semibold">상품 설명</label>
+        <label className="text-[var(--text-black)] text-lg font-semibold">
+          상품 설명
+        </label>
         <textarea
           placeholder="사이즈, 색상, 사용감, 사용기간, 브랜드명, 보증 기간 등 상세한 상품 정보를 입력하면 더욱 수월하게 거래 할 수 있습니다"
           value={productDescription}
