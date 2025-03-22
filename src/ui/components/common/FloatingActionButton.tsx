@@ -1,20 +1,13 @@
-"use client"
-import React, { useState, useEffect } from "react";
+"use client";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusOutlined, UpOutlined } from "@ant-design/icons";
 
 const FloatingActionButton: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setScrollElement(document.documentElement || document.body);
-    }
-  }, []);
-
-const scrollToTop = () => {
+  const scrollToTop = () => {
     const myPageContainer = document.getElementById("myPageContainer");
 
     if (myPageContainer) {
@@ -48,7 +41,10 @@ const scrollToTop = () => {
         )}
 
         {/* + 버튼 */}
-        <button style={styles.plusButton} onClick={() => setIsExpanded(!isExpanded)}>
+        <button
+          style={styles.plusButton}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
           <PlusOutlined style={{ fontSize: "24px", color: "#fff" }} />
         </button>
       </div>
