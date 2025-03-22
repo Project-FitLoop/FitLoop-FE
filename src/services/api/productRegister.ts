@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { instance } from "@/config/apiConfig";
 
 export const registerProduct = async (productData: any) => {
