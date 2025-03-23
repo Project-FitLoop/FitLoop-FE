@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import styles from "@/ui/components/tapbar/tab-bar.module.css";
 
 const tabs = [
   { name: "메인", path: "/", icon: "/assets/main.svg" },
@@ -21,16 +20,21 @@ const TabBar: React.FC = () => {
   if (hiddenPages.includes(pathname)) return null;
 
   return (
-    <div className={styles.tabBar}>
-      <div className={styles.menu}>
+    <div className="fixed bottom-0 left-0 w-full flex justify-center items-center px-0 py-2 z-50 bg-[var(--bg-white)] h-[50px]">
+      <div className="flex justify-center items-center w-full max-w-[500px] p-0">
         {tabs.map((tab) => (
           <Link
             key={tab.path}
             href={tab.path}
-            className={`${styles.tabItem} ${tab.special ? styles.specialTab : ""}`}
+            className={`flex flex-col items-center text-center w-full text-[var(--text-gray)] no-underline 
+              ${tab.special ? "relative -top-[10px]" : ""}`}
           >
             <div
-              className={`${styles.iconWrapper} ${tab.special ? styles.specialIconWrapper : ""}`}
+              className={`flex justify-center items-center mt-[5px] 
+                ${tab.special
+                  ? "w-[50px] h-[50px] bg-[var(--bg-white)] rounded-full shadow-md"
+                  : "w-[30px] h-[30px]"}`
+              }
             >
               <Image
                 src={tab.icon}
@@ -38,10 +42,10 @@ const TabBar: React.FC = () => {
                 width={24}
                 height={24}
                 priority
-                className={styles.icon}
+                className="opacity-70 transition-opacity duration-300 hover:opacity-100 w-[24px] h-[24px]"
               />
             </div>
-            <span className={`${styles.tabText} ${tab.special ? styles.specialText : ""}`}>
+            <span className="text-[12px] text-[var(--text-dark-gray)] font-normal mt-0 leading-[2] transition-all duration-300 hover:text-[var(--text-black)] hover:font-semibold">
               {tab.name}
             </span>
           </Link>
