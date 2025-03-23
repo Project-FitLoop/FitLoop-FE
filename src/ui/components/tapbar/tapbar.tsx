@@ -30,11 +30,11 @@ const TabBar: React.FC = () => {
               ${tab.special ? "relative -top-[10px]" : ""}`}
           >
             <div
-              className={`flex justify-center items-center mt-[5px] 
-                ${tab.special
+              className={`flex justify-center items-center mt-[5px] ${
+                tab.special
                   ? "w-[50px] h-[50px] bg-[var(--bg-white)] rounded-full shadow-md"
-                  : "w-[30px] h-[30px]"}`
-              }
+                  : "w-[30px] h-[30px]"
+              }`}
             >
               <Image
                 src={tab.icon}
