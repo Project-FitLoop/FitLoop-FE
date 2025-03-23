@@ -1,9 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
-import styles from "./ProductCard.module.css";
 import Image from "next/image";
-
 
 interface Product {
   id: number;
@@ -25,39 +23,49 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className={styles.productCard}>
-      {/* 상품 이미지 */}
-      <div className={styles.productImage}>
-        <Image 
-          src={product.imageUrl} 
-          alt={product.name} 
-          width={200} // 적절한 크기로 변경 (원본 해상도 고려)
-          height={200} 
-          className={styles.image} 
-          priority // 중요 이미지 최적화
+    <div className="w-full max-w-[180px] bg-[var(--background)] shadow-sm overflow-hidden text-left relative pb-1.5 transition-all duration-300 ease-in-out">
+      {/* 이미지 */}
+      <div className="w-full aspect-[3/4] bg-[var(--background)] flex items-center justify-center relative transition-all duration-300 ease-in-out">
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          width={200}
+          height={200}
+          priority
+          className="w-full h-full object-cover"
         />
-        <button className={styles.favoriteBtn} onClick={toggleFavorite}>
+        <button
+          onClick={toggleFavorite}
+          className="absolute bottom-[6px] right-[10px] bg-none border-none cursor-pointer text-[18px]"
+        >
           {isFavorite ? (
-            <HeartFilled className={styles.heartIconFilled} />
+            <HeartFilled className="text-red-500 text-[18px]" />
           ) : (
-            <HeartOutlined className={styles.heartIconOutlined} />
+            <HeartOutlined className="text-white stroke-white text-[18px]" />
           )}
         </button>
       </div>
 
       {/* 상품 정보 */}
-      <div className={styles.productInfo}>
-        <div className={styles.productName}>{product.name}</div>
+      <div className="px-1.5 pt-1.5 text-left">
+        <div className="text-[12px] font-bold mb-[3px]">{product.name}</div>
 
         {/* 태그 */}
-        <div className={styles.productTags}>
+        <div className="flex flex-wrap gap-[3px]">
           {product.tags.map((tag, index) => (
-            <span key={index} className={styles.tag}>#{tag}</span>
+            <span
+              key={index}
+              className="text-[10px] bg-[var(--bg-white)] text-[var(--text-dark-gray)] rounded-full px-[4px] py-[2px] border border-[var(--border-light-gray)]"
+            >
+              #{tag}
+            </span>
           ))}
         </div>
 
         {/* 가격 */}
-        <div className={styles.productPrice}>{product.price}</div>
+        <div className="text-[12px] font-bold text-[var(--text-black)] mt-[3px]">
+          {product.price}
+        </div>
       </div>
     </div>
   );
