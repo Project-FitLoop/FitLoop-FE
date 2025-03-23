@@ -36,12 +36,10 @@ export const subCategories: { [key: string]: { name: string; code: string }[] } 
         { name: "트레이닝 재킷", code: "011" },
         { name: "스타디움 재킷", code: "012" },
         { name: "환절기 코트", code: "013" },
-        { name: "겨울 싱글 코트", code: "014" },
-        { name: "겨울 더블 코트", code: "015" },
-        { name: "겨울 기타 코트", code: "016" },
-        { name: "롱패딩/헤비아우터", code: "017" },
-        { name: "패딩 베스트", code: "018" },
-        { name: "기타", code: "019" }
+        { name: "겨울 코트", code: "014" },
+        { name: "롱패딩/헤비아우터", code: "015" },
+        { name: "패딩 베스트", code: "016" },
+        { name: "기타", code: "017" }
     ],
     tops: [
         { name: "니트/스웨터", code: "001" },
