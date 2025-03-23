@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
 import { Modal } from "antd";
-import { ExclamationCircleOutlined, RightOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, RightOutlined} from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productRegister";
 import { uploadImages } from "@/services/api/imageUpload";
 import BackButton from "@/ui/components/common/BackButton";
@@ -21,7 +21,9 @@ const ProductRegisterForm: React.FC = () => {
   const [usedCondition, setUsedCondition] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [gender, setGender] = useState("");
-  
+  //화살표 상태
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
   // 모달
   const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
@@ -130,41 +132,65 @@ const ProductRegisterForm: React.FC = () => {
       {/* 대 카테고리 */}
       <div className="mb-1">
         <label className="text-[var(--text-dark-gray)] text-lg font-semibold">카테고리</label>
-        <select
-          value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
-            setSubCategory("");
-          }}
-          className="w-full p-3 border border-[var(--border-light-gray)] rounded-md mt-1 text-sm text-[var(--text-dark-gray)]"
-        >
-          <option value="">카테고리 선택</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.name}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+        <div className="relative mt-1">
+          <select
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setSubCategory("");
+            }}
+            onFocus={() => setIsCategoryOpen(true)}
+            onBlur={() => setIsCategoryOpen(false)}
+            className="w-full appearance-none p-3 pr-10 border border-[var(--border-light-gray)] rounded-md text-sm text-[var(--text-dark-gray)]"
+          >
+            <option value="">카테고리 선택</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+          <div
+            className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-200 pointer-events-none text-[var(--text-gray)] ${
+              isCategoryOpen ? "rotate-90" : ""
+            }`}
+          >
+            <RightOutlined />
+          </div>
+        </div>
       </div>
+
 
       {/* 중 카테고리 */}
       <div className="mb-10">
-        <select
-          value={subCategory}
-          onChange={(e) => setSubCategory(e.target.value)}
-          className="w-full p-3 border border-[var(--border-light-gray)] rounded-md mt-1 text-sm text-[var(--text-dark-gray)]"
-          disabled={!category}
-        >
-          <option value="">상세 카테고리 선택</option>
-          {category &&
-            subCategories[
-              categories.find(cat => cat.name === category)?.id || ""
-            ]?.map((sub) => (
-              <option key={sub.code} value={sub.name}>
-                {sub.name}
-              </option>
-            ))}
-        </select>
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">상세 카테고리</label>
+        <div className="relative mt-1">
+          <select
+            value={subCategory}
+            onChange={(e) => setSubCategory(e.target.value)}
+            onFocus={() => setIsSubCategoryOpen(true)}
+            onBlur={() => setIsSubCategoryOpen(false)}
+            disabled={!category}
+            className="w-full appearance-none p-3 pr-10 border border-[var(--border-light-gray)] rounded-md text-sm text-[var(--text-dark-gray)] disabled:bg-[var(--bg-light-gray)]"
+          >
+            <option value="">상세 카테고리 선택</option>
+            {category &&
+              subCategories[
+                categories.find((cat) => cat.name === category)?.id || ""
+              ]?.map((sub) => (
+                <option key={sub.code} value={sub.name}>
+                  {sub.name}
+                </option>
+              ))}
+          </select>
+          <div
+            className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-200 pointer-events-none text-[var(--text-gray)] ${
+              isSubCategoryOpen ? "rotate-90" : ""
+            }`}
+          >
+            <RightOutlined />
+          </div>
+        </div>
       </div>
 
       {/* 판매 가격 */}
@@ -220,14 +246,14 @@ const ProductRegisterForm: React.FC = () => {
         </label>
       </div>
 
-      {/* 성별 */}
+      {/* 사용대상 */}
       <div className="mb-10">
-        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">성별</label>
-        <div className="flex space-x-2 mt-2">
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">사용대상</label>
+        <div className="flex justify-center space-x-2 mt-2">
           {["공용", "남성", "여성"].map((option) => (
             <button
               key={option}
-              className={`px-4 py-2 rounded-md text-sm font-medium border ${
+              className={`min-w-[100px] px-4 py-2 rounded-md text-sm font-medium border text-center ${
                 gender === option
                   ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
                   : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
@@ -239,6 +265,8 @@ const ProductRegisterForm: React.FC = () => {
           ))}
         </div>
       </div>
+
+
 
       {/* 상품 사진 (여러 장 가능) */}
       <div className="mb-10">
