@@ -376,38 +376,84 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 상품 등록 안내 모달 */}
       <Modal
-        title="상품 등록 안내"
         open={isNoticeModalOpen}
         onCancel={() => setIsNoticeModalOpen(false)}
         footer={null}
+        centered
+        title={
+          <h3 className="text-xl font-bold text-center text-gray-800">상품 등록 안내</h3>
+        }
+        styles={{
+          body: {
+            padding: '20px',
+            fontSize: '14px',
+            color: '#444',
+            lineHeight: '1.7',
+            maxHeight: '400px',
+            overflowY: 'auto',
+          },
+          header: {
+            borderBottom: '1px solid #f0f0f0',
+          },
+        }}
       >
-        <p>상품 등록 시 반드시 정확한 정보를 입력해야 합니다.</p>
-        <p>- 가격, 카테고리, 상품 설명을 정확하게 작성하세요.</p>
-        <p>- 허위 정보를 등록할 경우 서비스 이용이 제한될 수 있습니다.</p>
-        <p>- 판매 후 변경이 어려울 수 있으니 신중하게 입력해주세요.</p>
+        <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
+          <li>상품 등록 시 반드시 정확한 정보를 입력해야 합니다.</li>
+          <li>가격, 카테고리, 상품 설명을 명확히 작성하세요.</li>
+          <li>허위 정보 등록 시 서비스 이용이 제한될 수 있습니다.</li>
+          <li>판매 후에는 변경이 어려우니 신중하게 입력해주세요.</li>
+        </ul>
       </Modal>
 
       {/* 개인정보 제공 안내 모달 */}
       <Modal
-        title="개인정보 제공 안내"
         open={isPrivacyModalOpen}
         onCancel={() => setIsPrivacyModalOpen(false)}
         footer={null}
+        centered
+        title={
+          <h3 className="text-xl font-bold text-center text-gray-800">🔐 개인정보 제공 안내</h3>
+        }
+        styles={{
+          body: {
+            padding: '20px',
+            fontSize: '14px',
+            color: '#444',
+            lineHeight: '1.7',
+          },
+        }}
       >
-        <p>상품 거래와 관련하여 개인정보가 일부 제공될 수 있습니다.</p>
-        <p>- 구매자가 원활한 거래를 위해 연락할 수 있도록 연락처가 공유될 수 있습니다.</p>
-        <p>- 개인 정보 보호를 위해 등록된 정보는 암호화하여 저장됩니다.</p>
-        <p>- 사용자의 동의 없이 제3자에게 제공되지 않습니다.</p>
+        <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
+          <li>상품 거래를 위해 일부 개인정보가 제공될 수 있습니다.</li>
+          <li>구매자와 원활한 거래를 위해 연락처가 공유될 수 있습니다.</li>
+          <li>등록된 정보는 암호화되어 저장되며, 제3자에게 제공되지 않습니다.</li>
+        </ul>
       </Modal>
 
       {/* 추가 중고 상품 상태 모달 */}
-      <Modal title="추가 상품 안내" open={isUsedConditionModalOpen} onCancel={() => setIsUsedConditionModalOpen(false)} footer={null}>
-        <p>※ 상품의 상태를 정확하게 입력해주세요.</p>
-        <p>- 거의 새 상품: 사용하지 않고 포장만 개봉된 상태</p>
-        <p>※ 중고 상품의 경우</p>
-        <p>- 좋음: 사용감이 적고 깨끗한 상태</p>
-        <p>- 보통: 사용감이 있으나 기능상 문제 없음</p>
-        <p>- 나쁨: 사용감이 크고 일부 흠집이 있을 수 있음</p>
+      <Modal
+        open={isUsedConditionModalOpen}
+        onCancel={() => setIsUsedConditionModalOpen(false)}
+        footer={null}
+        centered
+        title={
+          <h3 className="text-xl font-bold text-center text-gray-800">중고 상태 안내</h3>
+        }
+        styles={{
+          body: {
+            padding: '20px',
+            fontSize: '14px',
+            color: '#444',
+            lineHeight: '1.7',
+          },
+        }}
+      >
+        <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
+          <li>거의 새 상품: 사용하지 않았거나 포장만 개봉한 상태</li>
+          <li>좋음: 사용감이 적고 상태가 양호함</li>
+          <li>보통: 사용감은 있으나 기능에 문제 없음</li>
+          <li>나쁨: 사용감이 크고 흠집 등이 있음</li>
+        </ul>
       </Modal>
     </div>
   );
