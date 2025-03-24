@@ -13,7 +13,7 @@ const tabs = [
   { name: "마이페이지", path: "/mypage", icon: "/assets/mypage.svg" },
 ];
 
-const hiddenPages = ["/admin", "/register", "/personinfo"];
+const hiddenPages = ["/admin", "/register", "/personinfo", "/products/register"];
 
 const TabBar: React.FC = () => {
   const pathname = usePathname();

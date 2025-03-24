@@ -107,7 +107,7 @@ const ProductRegisterForm: React.FC = () => {
   };  
 
   return (
-    <div className="max-w-md w-full bg-[var(--bg-white)] p-6 pb-20">
+    <div className="max-w-md w-full bg-[var(--bg-white)] p-6 pb-10">
       <div className="flex items-center gap-2 mb-4">
         <BackButton />
         <h2 className="text-lg font-semibold text-[var(--text-black)]">
