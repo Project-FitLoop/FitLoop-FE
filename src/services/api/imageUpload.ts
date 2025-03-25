@@ -5,7 +5,7 @@ export const uploadImages = async (files: File[]): Promise<string[]> => {
   files.forEach((file) => formData.append("images", file));
 
   try {
-    const response = await instance.post("/productregister/image", formData, {
+    const response = await instance.post("/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
