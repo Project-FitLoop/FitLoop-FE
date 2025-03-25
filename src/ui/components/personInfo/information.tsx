@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Form, Input, Button, Select, Progress, Typography } from "antd";
+import { Form, Input, Button, Select, Progress, Typography, message } from "antd";
 import type { Rule } from "antd/es/form";
 import { registerInfomation } from "@/services/api/user";
 import { useRouter } from "next/navigation";
@@ -64,7 +64,7 @@ const Information: React.FC = () => {
           updatedValues.height!,
           updatedValues.weight!
         );
-        alert("프로필 작성이 완료되었습니다!");
+        message.success("프로필 작성이 완료되었습니다!");
         router.push("/dashboard");
       }
     } catch (error) {
