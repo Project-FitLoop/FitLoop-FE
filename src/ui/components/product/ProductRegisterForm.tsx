@@ -74,15 +74,20 @@ const ProductRegisterForm: React.FC = () => {
     const uploadedUrls = await uploadImages(imageFiles);
     const finalProductCondition = usedCondition || productCondition;
   
+    let finalSubCategory = subCategory;
+    if (subCategory === "기타" || subCategory === "전체") {
+      finalSubCategory = `${category}_${subCategory}`;
+    }
+
     const formData = {
       productName,
       category,
-      subCategory,
+      subCategory: finalSubCategory,
       price: isFree ? 0 : parseInt(price, 10),
       isFree,
       includeShipping,
       gender,
-      images: uploadedUrls ? "없음" : uploadedUrls,
+      images: uploadedUrls ? ["없음"] : uploadedUrls,
       productCondition: finalProductCondition,
       productDescription,
     };
