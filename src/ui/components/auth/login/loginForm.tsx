@@ -16,7 +16,7 @@ const LoginForm: React.FC = () => {
   const onFinish = useCallback(async (values: LoginFormValues) => {
     try {
       const { accessToken, personalInfo } = await loginUser(values.username, values.password);
-      window.localStorage.setItem("access", accessToken);
+      document.cookie = `access=${accessToken}; path=/;`;
       message.success("로그인 성공!");
       // personal_info 값에 따라 이동
       window.location.href = personalInfo ? "/mypage" : "/personinfo";
