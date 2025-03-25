@@ -3,26 +3,25 @@ import axios from "axios";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 //로그인 API 호출
-export const loginUser = async (username: string, password: string
+export const loginUser = async (
+  username: string,
+  password: string
 ): Promise<{ accessToken: string; personalInfo: boolean }> => {
-
   try {
     const response = await axios.post(
       `${API_BASE_URL}/login`,
       { username, password },
-      { withCredentials: true } //쿠키 포함
+      { withCredentials: true }
     );
 
-    // 응답 데이터에서 personal_info 가져오기
-    const { personalInfo } = response.data;
-    //응답 헤더에서 Access Token 추출
     const accessToken = response.headers["access"];
     if (!accessToken) {
       throw new Error("Access Token이 응답 헤더에 없습니다.");
     }
 
-    //Access Token 반환
-    return { accessToken, personalInfo: personalInfo };
+    const personalInfo = response.data.personal_info;
+
+    return { accessToken, personalInfo };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error("로그인 실패:", error.response?.data?.message || error.message);

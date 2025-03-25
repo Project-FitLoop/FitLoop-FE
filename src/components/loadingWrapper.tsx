@@ -19,8 +19,6 @@ const LoadingWrapper: React.FC = () => {
     };
   }, []);
 
-  console.log('isLoading:', isLoading);
-
   return (
     <div>
       {isLoading ? (

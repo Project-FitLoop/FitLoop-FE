@@ -1,4 +1,6 @@
 import MyPage from "@/ui/components/mypage/mypage";
+import FloatingActionButton from "@/ui/components/common/FloatingActionButton";
+
 
 export default function Page() {
   return (
@@ -6,6 +8,7 @@ export default function Page() {
       <div style={{ width: "100%", maxWidth: "400px", height: "auto" }}>
         <MyPage />
       </div>
+      <FloatingActionButton />
     </div>
   );
 }
