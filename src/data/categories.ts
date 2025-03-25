@@ -13,6 +13,7 @@ export const categories = [
 // 중분류
 export const subCategories: { [key: string]: { name: string; code: string }[] } = {
     shoes: [
+        { name: "전체", code: "000"},
         { name: "스니커즈", code: "001" },
         { name: "패딩/퍼 신발", code: "002" },
         { name: "부츠/워커", code: "003" },
@@ -23,6 +24,7 @@ export const subCategories: { [key: string]: { name: string; code: string }[] } 
         { name: "기타", code: "008" }
     ],
     outerwear: [
+        { name: "전체", code: "000"},
         { name: "숏패딩/헤비아우터", code: "001" },
         { name: "무스탕 / 퍼", code: "002" },
         { name: "후드 집업", code: "003" },
@@ -42,6 +44,7 @@ export const subCategories: { [key: string]: { name: string; code: string }[] } 
         { name: "기타", code: "017" }
     ],
     tops: [
+        { name: "전체", code: "000"},
         { name: "니트/스웨터", code: "001" },
         { name: "맨투맨/스웨트", code: "002" },
         { name: "후드 티셔츠", code: "003" },
@@ -53,6 +56,7 @@ export const subCategories: { [key: string]: { name: string; code: string }[] } 
         { name: "기타", code: "009" }
     ],
     pants: [
+        { name: "전체", code: "000"},
         { name: "데님 팬츠", code: "001" },
         { name: "트레이닝/조거팬츠", code: "002" },
         { name: "코튼 팬츠", code: "003" },
@@ -63,18 +67,21 @@ export const subCategories: { [key: string]: { name: string; code: string }[] } 
         { name: "기타", code: "008" }
     ],
     dresses: [
+        { name: "전체", code: "000"},
         { name: "미니원피스", code: "001" },
         { name: "미디원피스", code: "002" },
         { name: "맥시원피스", code: "003" },
         { name: "기타", code: "004" }
     ],
     skirts: [
+        { name: "전체", code: "000"},
         { name: "미니스커트", code: "001" },
         { name: "미디스커트", code: "002" },
         { name: "롱스커트", code: "003" },
         { name: "기타", code: "004" }
     ],
     bags: [
+        { name: "전체", code: "000"},
         { name: "메신저/크로스백", code: "001" },
         { name: "숄더백", code: "002" },
         { name: "백팩", code: "003" },
@@ -91,6 +98,7 @@ export const subCategories: { [key: string]: { name: string; code: string }[] } 
         { name: "기타", code: "014" }
     ],
     fashionAccessories: [
+        { name: "전체", code: "000"},
         { name: "모자", code: "001" },
         { name: "머플러", code: "002" },
         { name: "주얼리", code: "003" },
