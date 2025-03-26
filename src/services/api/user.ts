@@ -1,8 +1,13 @@
 import { instance } from "@/config/apiConfig";
 
+const getAccessTokenFromCookie = (): string | null => {
+  const match = document.cookie.match(/(?:^|; )access=([^;]*)/);
+  return match ? match[1] : null;
+};
+
 // 사용자 정보 조회 API (반환 타입 명확히 지정)
 export const fetchUserInfo = async (): Promise<{ username: string }> => {
-  const accessToken = localStorage.getItem("access");
+  const accessToken = getAccessTokenFromCookie();
 
   if (!accessToken) {
     throw new Error("Access Token이 없습니다. 로그인해주세요.");
@@ -25,7 +30,7 @@ export const registerInfomation = async (
   height: number,
   weight: number
 ): Promise<boolean> => {
-  const accessToken = localStorage.getItem("access");
+  const accessToken = getAccessTokenFromCookie();
 
   if (!accessToken) {
     alert("Access Token이 없습니다. 로그인해주세요.");

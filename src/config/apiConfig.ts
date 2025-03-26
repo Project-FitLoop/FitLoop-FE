@@ -10,7 +10,9 @@ const instance = axios.create({
 //모든 요청에 access 토큰 자동 포함
 instance.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("access");
+    const match = document.cookie.match(/(?:^|; )access=([^;]*)/);
+    const accessToken = match ? match[1] : null;
+
     if (accessToken) {
       config.headers["access"] = accessToken;
     }
