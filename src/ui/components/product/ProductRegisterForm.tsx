@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
-import { Modal } from "antd";
+import { message, Modal } from "antd";
 import { ExclamationCircleOutlined, RightOutlined} from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productRegister";
 import { uploadImages } from "@/services/api/imageUpload";
@@ -94,7 +94,7 @@ const ProductRegisterForm: React.FC = () => {
   
     try {
       await registerProduct(formData);
-      alert("상품이 성공적으로 등록되었습니다.");
+      message.success("상품이 성공적으로 등록되었습니다.");
       setProductName("");
       setCategory("");
       setSubCategory("");
