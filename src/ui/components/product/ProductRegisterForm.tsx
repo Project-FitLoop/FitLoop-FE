@@ -71,7 +71,11 @@ const ProductRegisterForm: React.FC = () => {
       return;
     }
 
-    const uploadedUrls = await uploadImages(imageFiles);
+    const uploadedUrls: string[] | undefined = await uploadImages(imageFiles);
+    const imageUrls = Array.isArray(uploadedUrls) && uploadedUrls.length > 0
+  ? uploadedUrls
+  : ["없음"];
+  
     const finalProductCondition = usedCondition || productCondition;
   
     let finalSubCategory = subCategory;
@@ -87,7 +91,7 @@ const ProductRegisterForm: React.FC = () => {
       isFree,
       includeShipping,
       gender,
-      images: uploadedUrls ? ["없음"] : uploadedUrls,
+      images: uploadedUrls.length > 0 ? uploadedUrls : ["없음"],
       productCondition: finalProductCondition,
       productDescription,
     };
@@ -95,6 +99,7 @@ const ProductRegisterForm: React.FC = () => {
     try {
       await registerProduct(formData);
       alert("상품이 성공적으로 등록되었습니다.");
+      images.forEach((src) => URL.revokeObjectURL(src));
       setProductName("");
       setCategory("");
       setSubCategory("");
@@ -103,6 +108,7 @@ const ProductRegisterForm: React.FC = () => {
       setIncludeShipping(false);
       setGender("");
       setImages([]);
+      setImageFiles([]);
       setProductCondition("");
       setUsedCondition("");
       setProductDescription("");
