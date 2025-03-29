@@ -4,14 +4,11 @@ import Information from "@/ui/components/personInfo/information";
 const PersonInfoPage: React.FC = () => {
   return (
     <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+      className="min-h-screen flex items-center justify-center bg-[color:var(--bg-white)]"
     >
-      <Information />
+      <div className="w-full max-w-[400px]">
+        <Information />
+      </div>
     </div>
   );
 };
