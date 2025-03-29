@@ -7,6 +7,7 @@ import { registerProduct } from "@/services/api/productRegister";
 import { uploadImages } from "@/services/api/imageUpload";
 import BackButton from "@/ui/components/common/BackButton";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const ProductRegisterForm: React.FC = () => {
   const [productName, setProductName] = useState("");
@@ -30,6 +31,7 @@ const ProductRegisterForm: React.FC = () => {
   const [isUsedConditionModalOpen, setIsUsedConditionModalOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,9 +74,6 @@ const ProductRegisterForm: React.FC = () => {
     }
 
     const uploadedUrls: string[] | undefined = await uploadImages(imageFiles);
-    const imageUrls = Array.isArray(uploadedUrls) && uploadedUrls.length > 0
-  ? uploadedUrls
-  : ["없음"];
   
     const finalProductCondition = usedCondition || productCondition;
   
@@ -112,6 +111,7 @@ const ProductRegisterForm: React.FC = () => {
       setProductCondition("");
       setUsedCondition("");
       setProductDescription("");
+      router.push("/products/complete");
     } catch {
       alert("상품 등록 중 오류가 발생했습니다.");
     }
@@ -188,11 +188,13 @@ const ProductRegisterForm: React.FC = () => {
             {category &&
               subCategories[
                 categories.find((cat) => cat.name === category)?.id || ""
-              ]?.map((sub) => (
-                <option key={sub.code} value={sub.name}>
-                  {sub.name}
-                </option>
-              ))}
+              ]
+                ?.filter((sub) => sub.name !== "전체")
+                .map((sub) => (
+                  <option key={sub.code} value={sub.name}>
+                    {sub.name}
+                  </option>
+                ))}
           </select>
           <div
             className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-200 pointer-events-none text-[var(--text-gray)] ${
