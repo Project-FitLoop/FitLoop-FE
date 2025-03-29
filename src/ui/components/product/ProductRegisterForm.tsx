@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
-import { Modal } from "antd";
+import { Modal, message } from "antd";
 import { ExclamationCircleOutlined, RightOutlined} from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productRegister";
 import { uploadImages } from "@/services/api/imageUpload";
@@ -69,7 +69,7 @@ const ProductRegisterForm: React.FC = () => {
     if (!productName || !category || !subCategory || !price || 
       !productCondition || !gender
     ) {
-      alert("모든 필수 정보를 입력해주세요.");
+      message.error("모든 필수 정보를 입력해주세요.");
       return;
     }
 
@@ -97,7 +97,7 @@ const ProductRegisterForm: React.FC = () => {
   
     try {
       await registerProduct(formData);
-      alert("상품이 성공적으로 등록되었습니다.");
+      message.success("상품이 성공적으로 등록되었습니다.");
       images.forEach((src) => URL.revokeObjectURL(src));
       setProductName("");
       setCategory("");
@@ -113,7 +113,7 @@ const ProductRegisterForm: React.FC = () => {
       setProductDescription("");
       router.push("/products/complete");
     } catch {
-      alert("상품 등록 중 오류가 발생했습니다.");
+      message.error("상품 등록 중 오류가 발생했습니다.");
     }
   };  
 
