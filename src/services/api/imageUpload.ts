@@ -5,11 +5,7 @@ export const uploadImages = async (files: File[]): Promise<string[]> => {
   files.forEach((file) => formData.append("file", file));
 
   try {
-    const response = await instance.post("/upload", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await instance.post("/upload", formData);
 
     return response.data;
   } catch (error) {
