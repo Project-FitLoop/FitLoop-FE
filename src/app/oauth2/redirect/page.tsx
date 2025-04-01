@@ -18,7 +18,7 @@ const OAuthRedirect = () => {
         console.log("Access Token 요청 시작");
         const accessToken = await reissueAccessToken();
 
-        window.localStorage.setItem("access", accessToken);
+        document.cookie = `access=${accessToken}; path=/;`;
         message.success("OAuth2 로그인 성공!");
 
         router.push("/dashboard");

@@ -10,7 +10,9 @@ const instance = axios.create({
 //모든 요청에 access 토큰 자동 포함
 instance.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("access");
+    const match = document.cookie.match(/(?:^|; )access=([^;]*)/);
+    const accessToken = match ? match[1] : null;
+
     if (accessToken) {
       config.headers["access"] = accessToken;
     }
@@ -29,12 +31,22 @@ instance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const res = await axios.post(`${instance.defaults.baseURL}/reissue`, {}, { withCredentials: true });
-        const newAccessToken = res.data.accessToken;
+        const res = await axios.post(
+          `${instance.defaults.baseURL}/reissue`,
+          {},
+          { withCredentials: true }
+        );
 
-        // 새 Access Token 저장 및 요청 재시도
-        instance.defaults.headers.common["access"] = `Bearer ${newAccessToken}`;
-        originalRequest.headers["access"] = `Bearer ${newAccessToken}`;
+        const newAccessToken = res.headers["access"];
+        if (!newAccessToken) {
+          throw new Error("Access Token이 응답 헤더에 없습니다.");
+        }
+
+        document.cookie = `access=${newAccessToken}; path=/;`;
+
+        instance.defaults.headers.common["access"] = newAccessToken;
+        originalRequest.headers["access"] = newAccessToken;
+
         return instance(originalRequest);
       } catch (refreshError) {
         message.error("세션이 만료되었습니다. 다시 로그인해주세요.");

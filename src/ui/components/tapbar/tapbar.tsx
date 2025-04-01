@@ -21,7 +21,7 @@ const TabBar: React.FC = () => {
 
   return (
     <div className="fixed bottom-0 left-0 w-full flex justify-center items-center px-0 py-2 z-50 bg-[var(--bg-white)] h-[50px]">
-      <div className="flex justify-center items-center w-full max-w-[500px] p-0">
+      <div className="flex justify-center items-center w-full max-w-[400px] p-0">
         {tabs.map((tab) => (
           <Link
             key={tab.path}

@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
-import { Modal } from "antd";
+import { Modal, message } from "antd";
 import { ExclamationCircleOutlined, RightOutlined} from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productRegister";
 import { uploadImages } from "@/services/api/imageUpload";
 import BackButton from "@/ui/components/common/BackButton";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const ProductRegisterForm: React.FC = () => {
   const [productName, setProductName] = useState("");
@@ -30,6 +31,7 @@ const ProductRegisterForm: React.FC = () => {
   const [isUsedConditionModalOpen, setIsUsedConditionModalOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,18 +69,22 @@ const ProductRegisterForm: React.FC = () => {
     if (!productName || !category || !subCategory || !price || 
       !productCondition || !gender
     ) {
-      alert("모든 필수 정보를 입력해주세요.");
+      message.error("모든 필수 정보를 입력해주세요.");
       return;
     }
 
-    const uploadedUrls = await uploadImages(imageFiles);
+    let uploadedUrls: string[] = [];
+    if (imageFiles.length > 0) {
+      uploadedUrls = await uploadImages(imageFiles);
+    }
+  
     const finalProductCondition = usedCondition || productCondition;
   
     let finalSubCategory = subCategory;
     if (subCategory === "기타" || subCategory === "전체") {
       finalSubCategory = `${category}_${subCategory}`;
     }
-
+  
     const formData = {
       productName,
       category,
@@ -87,14 +93,16 @@ const ProductRegisterForm: React.FC = () => {
       isFree,
       includeShipping,
       gender,
-      images: uploadedUrls ? ["없음"] : uploadedUrls,
+      images: uploadedUrls.length > 0 ? uploadedUrls : ["없음"],
       productCondition: finalProductCondition,
       productDescription,
     };
   
     try {
       await registerProduct(formData);
-      alert("상품이 성공적으로 등록되었습니다.");
+      message.success("상품이 성공적으로 등록되었습니다.");
+      images.forEach((src) => URL.revokeObjectURL(src));
+  
       setProductName("");
       setCategory("");
       setSubCategory("");
@@ -103,11 +111,14 @@ const ProductRegisterForm: React.FC = () => {
       setIncludeShipping(false);
       setGender("");
       setImages([]);
+      setImageFiles([]);
       setProductCondition("");
       setUsedCondition("");
       setProductDescription("");
+  
+      router.push("/products/complete");
     } catch {
-      alert("상품 등록 중 오류가 발생했습니다.");
+      message.error("상품 등록 중 오류가 발생했습니다.");
     }
   };  
 
@@ -182,11 +193,13 @@ const ProductRegisterForm: React.FC = () => {
             {category &&
               subCategories[
                 categories.find((cat) => cat.name === category)?.id || ""
-              ]?.map((sub) => (
-                <option key={sub.code} value={sub.name}>
-                  {sub.name}
-                </option>
-              ))}
+              ]
+                ?.filter((sub) => sub.name !== "전체")
+                .map((sub) => (
+                  <option key={sub.code} value={sub.name}>
+                    {sub.name}
+                  </option>
+                ))}
           </select>
           <div
             className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-200 pointer-events-none text-[var(--text-gray)] ${

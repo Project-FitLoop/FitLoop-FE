@@ -114,7 +114,7 @@ export const logoutUser = async (): Promise<void> => {
       console.log("로그아웃 성공!");
 
       // sessionStorage.removeItem("user");
-      localStorage.removeItem("access");
+      document.cookie = "access=; path=/; max-age=0;";
     } else {
       throw new Error("로그아웃 요청 실패");
     }
