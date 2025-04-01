@@ -73,7 +73,10 @@ const ProductRegisterForm: React.FC = () => {
       return;
     }
 
-    const uploadedUrls: string[] | undefined = await uploadImages(imageFiles);
+    let uploadedUrls: string[] = [];
+    if (imageFiles.length > 0) {
+      uploadedUrls = await uploadImages(imageFiles);
+    }
   
     const finalProductCondition = usedCondition || productCondition;
   
@@ -81,7 +84,7 @@ const ProductRegisterForm: React.FC = () => {
     if (subCategory === "기타" || subCategory === "전체") {
       finalSubCategory = `${category}_${subCategory}`;
     }
-
+  
     const formData = {
       productName,
       category,
@@ -99,6 +102,7 @@ const ProductRegisterForm: React.FC = () => {
       await registerProduct(formData);
       message.success("상품이 성공적으로 등록되었습니다.");
       images.forEach((src) => URL.revokeObjectURL(src));
+  
       setProductName("");
       setCategory("");
       setSubCategory("");
@@ -111,6 +115,7 @@ const ProductRegisterForm: React.FC = () => {
       setProductCondition("");
       setUsedCondition("");
       setProductDescription("");
+  
       router.push("/products/complete");
     } catch {
       message.error("상품 등록 중 오류가 발생했습니다.");
