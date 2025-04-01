@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Lottie from "lottie-react";
+import type { AnimationConfigWithData } from "lottie-web";
 
 export default function CompleteRegister() {
   const router = useRouter();
-  const [animationData, setAnimationData] = useState<any>(null);
+  const [animationData, setAnimationData] = useState<AnimationConfigWithData["animationData"] | null>(null);
 
   useEffect(() => {
     fetch("/success.json")
