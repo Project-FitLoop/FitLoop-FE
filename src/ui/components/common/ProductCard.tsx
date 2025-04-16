@@ -7,7 +7,7 @@ interface Product {
   id: number;
   name: string;
   imageUrl: string;
-  tags: string[];
+  tags?: string[];
   price: string;
 }
 
@@ -27,7 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* 이미지 */}
       <div className="w-full aspect-[3/4] bg-[var(--background)] flex items-center justify-center relative transition-all duration-300 ease-in-out">
         <Image
-          src={product.imageUrl}
+          src={product.imageUrl || "/assets/default.png"} // ✅ fallback 이미지 경로
           alt={product.name}
           width={200}
           height={200}
@@ -52,7 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* 태그 */}
         <div className="flex flex-wrap gap-[3px]">
-          {product.tags.map((tag, index) => (
+          {(product.tags ?? []).map((tag, index) => (
             <span
               key={index}
               className="text-[10px] bg-[var(--bg-white)] text-[var(--text-dark-gray)] rounded-full px-[4px] py-[2px] border border-[var(--border-light-gray)]"
