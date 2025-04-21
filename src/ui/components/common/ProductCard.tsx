@@ -47,24 +47,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* 상품 정보 */}
-      <div className="px-1.5 pt-1.5 text-left">
-        <div className="text-[12px] font-bold mb-[3px]">{product.name}</div>
+      <div className="px-1.5 pt-1.5 flex flex-col gap-1">
+        {/* 상품명 */}
+        <div className="text-[12px] font-bold leading-tight line-clamp-1 break-keep">
+          {product.name}
+        </div>
+
+        {/* 가격 */}
+        <div className="text-[12px] font-bold text-[var(--text-black)]">
+          {product.price}
+        </div>
 
         {/* 태그 */}
-        <div className="flex flex-wrap gap-[3px]">
-          {(product.tags ?? []).map((tag, index) => (
+        <div className="flex overflow-hidden gap-[2px] max-w-full">
+          {(product.tags ?? []).slice(0, 2).map((tag, index) => (
             <span
               key={index}
-              className="text-[10px] bg-[var(--bg-white)] text-[var(--text-dark-gray)] rounded-full px-[4px] py-[2px] border border-[var(--border-light-gray)]"
+              className="text-[9px] whitespace-nowrap text-ellipsis overflow-hidden bg-[var(--bg-white)] text-[var(--text-dark-gray)] rounded-full px-[3px] py-[1px] border border-[var(--border-light-gray)]"
+              style={{ maxWidth: "60px" }}
             >
               #{tag}
             </span>
           ))}
-        </div>
-
-        {/* 가격 */}
-        <div className="text-[12px] font-bold text-[var(--text-black)] mt-[3px]">
-          {product.price}
         </div>
       </div>
     </div>
