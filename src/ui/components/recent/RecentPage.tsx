@@ -74,7 +74,6 @@ const RecentPage: React.FC<RecentPageProps> = ({ categoryCode }) => {
 
   return (
     <div className="px-4 py-6">
-      <h2 className="text-xl font-semibold mb-4">최근 등록된 상품</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 justify-items-center">
         {products.map((product, index) => {
           const isLast = index === products.length - 1;
