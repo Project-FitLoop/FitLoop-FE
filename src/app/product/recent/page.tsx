@@ -1,4 +1,19 @@
+import Recent from '@/ui/components/recent/RecentPage';
+import FloatingActionButton from '@/ui/components/common/FloatingActionButton';
+
 export default function RecentPage() {
-  return <div>최근 등록된 상품 페이지</div>;
+  return (
+    <div
+      id="scrollable-container"
+      style={{
+        height: '100vh',
+        overflowY: 'auto',
+        scrollBehavior: 'smooth',
+      }
+      } className="scrollbar-hide"
+    >
+      <Recent />
+      <FloatingActionButton />
+    </div>
+  );
 }
-  

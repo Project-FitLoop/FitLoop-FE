@@ -15,7 +15,10 @@ const MyPage: React.FC = () => {
   const banners = Array.from({ length: 5 }, (_, i) => `${s3BaseUrl}advertisement_${i + 1}.png`);
 
   return (
-    <div id="myPageContainer" className="max-w-[400px] mx-auto p-0 bg-[var(--bg-gray)] min-h-screen max-h-screen pb-[60px] overflow-auto">
+    <div
+      id="scrollable-container"
+      className="max-w-[400px] mx-auto p-0 bg-[var(--bg-gray)] min-h-screen pb-[60px] overflow-auto"
+    >
       {/* 마이페이지 ~ 구매내역 */}
       <div className="bg-[var(--bg-white)] p-4">
         {/* 상단 네비게이션 */}

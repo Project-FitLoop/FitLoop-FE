@@ -8,11 +8,11 @@ const FloatingActionButton: React.FC = () => {
   const router = useRouter();
 
   const scrollToTop = () => {
-    const myPageContainer = document.getElementById("myPageContainer");
+    const scrollContainer = document.getElementById("scrollable-container");
 
-    if (myPageContainer) {
-      myPageContainer.scrollTop = 0;
-      myPageContainer.scrollTo({ top: 0, behavior: "smooth" });
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }

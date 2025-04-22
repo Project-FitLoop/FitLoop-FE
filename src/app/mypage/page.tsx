@@ -1,11 +1,21 @@
 import MyPage from "@/ui/components/mypage/mypage";
 import FloatingActionButton from "@/ui/components/common/FloatingActionButton";
 
-
 export default function Page() {
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
-      <div style={{ width: "100%", maxWidth: "400px", height: "auto" }}>
+    <div
+      id="scrollable-container" 
+      className="scrollbar-hide"
+      style={{
+        height: "100vh",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        scrollBehavior: "smooth",
+        alignItems: "center",
+      }}
+    >
+      <div style={{ width: "100%", maxWidth: "400px" }}>
         <MyPage />
       </div>
       <FloatingActionButton />
