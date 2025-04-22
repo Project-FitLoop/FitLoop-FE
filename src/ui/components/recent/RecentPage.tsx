@@ -1,14 +1,9 @@
 'use client';
-
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ProductCard from '@/ui/components/common/ProductCard';
 import { fetchRecentProducts, ProductResponse } from '@/services/api/productApi';
 
-interface RecentPageProps {
-  categoryCode?: string;
-}
-
-const RecentPage: React.FC<RecentPageProps> = ({ categoryCode }) => {
+const RecentPage: React.FC = () => {
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -34,19 +29,18 @@ const RecentPage: React.FC<RecentPageProps> = ({ categoryCode }) => {
 
   useEffect(() => {
     if (!loading) loadProducts(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   const lastProductRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (loading || !hasMore) return;
       if (observer.current) observer.current.disconnect();
-
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
           setPage((prev) => prev + 1);
         }
       });
-
       if (node) observer.current.observe(node);
     },
     [loading, hasMore]
