@@ -1,9 +1,17 @@
 import Recent from '@/ui/components/recent/RecentPage';
-import FloatingActionButton from "@/ui/components/common/FloatingActionButton";
+import FloatingActionButton from '@/ui/components/common/FloatingActionButton';
 
 export default function RecentPage() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div
+      id="scrollable-container"
+      style={{
+        height: '100vh',
+        overflowY: 'auto',
+        scrollBehavior: 'smooth',
+      }
+    } className="scrollbar-hide"
+    >
       <Recent />
       <FloatingActionButton />
     </div>
