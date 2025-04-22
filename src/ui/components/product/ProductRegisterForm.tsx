@@ -3,7 +3,7 @@ import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
 import { Modal, message } from "antd";
 import { ExclamationCircleOutlined, RightOutlined} from "@ant-design/icons";
-import { registerProduct } from "@/services/api/productRegister";
+import { registerProduct } from "@/services/api/productApi";
 import { uploadImages } from "@/services/api/imageUpload";
 import BackButton from "@/ui/components/common/BackButton";
 import Image from "next/image";

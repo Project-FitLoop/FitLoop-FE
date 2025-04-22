@@ -1,20 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import axios from 'axios';
 import ProductCard from '@/ui/components/common/ProductCard';
-
-interface ProductResponse {
-  id: number;
-  name: string;
-  price: number;
-  includeShipping: boolean;
-  likeCount: number;
-  createdAt: string;
-  imageUrls: string[];
-  tags?: string[];
-  free: boolean;
-}
+import { fetchRecentProducts, ProductResponse } from '@/services/api/productApi';
 
 interface RecentPageProps {
   categoryCode?: string;
@@ -27,21 +15,15 @@ const RecentPage: React.FC<RecentPageProps> = ({ categoryCode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const fetchProducts = async (page: number) => {
+  const loadProducts = async (page: number) => {
     setLoading(true);
     try {
-      const response = await axios.get<ProductResponse[]>(
-        `http://localhost:8080/api/v1/products/recent?page=${page}&size=9`
-      );
-      console.log("요청됨");
-      const newProducts = response.data;
-
+      const newProducts = await fetchRecentProducts(page);
       setProducts((prev) => {
         const ids = new Set(prev.map((p) => p.id));
         const uniqueNew = newProducts.filter((p) => !ids.has(p.id));
         return [...prev, ...uniqueNew];
       });
-
       setHasMore(newProducts.length === 9);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -51,9 +33,7 @@ const RecentPage: React.FC<RecentPageProps> = ({ categoryCode }) => {
   };
 
   useEffect(() => {
-    if (!loading) {
-      fetchProducts(page);
-    }
+    if (!loading) loadProducts(page);
   }, [page]);
 
   const lastProductRef = useCallback(
@@ -77,7 +57,6 @@ const RecentPage: React.FC<RecentPageProps> = ({ categoryCode }) => {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 justify-items-center">
         {products.map((product, index) => {
           const isLast = index === products.length - 1;
-
           return (
             <div key={product.id} ref={isLast ? lastProductRef : null}>
               <ProductCard
