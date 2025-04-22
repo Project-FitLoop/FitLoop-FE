@@ -10,7 +10,7 @@ export default function RecentPage() {
         overflowY: 'auto',
         scrollBehavior: 'smooth',
       }
-    } className="scrollbar-hide"
+      } className="scrollbar-hide"
     >
       <Recent />
       <FloatingActionButton />
