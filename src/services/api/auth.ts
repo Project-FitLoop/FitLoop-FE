@@ -105,15 +105,35 @@ export const reissueAccessToken = async (): Promise<string> => {
   }
 };
 
-//로그아웃 API 호출
+// 쿠키에서 특정 이름의 값을 꺼내는 함수
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+  return null;
+};
+
+// access 토큰을 쿠키에서 꺼내서 로그아웃 요청
 export const logoutUser = async (): Promise<void> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
+    const accessToken = getCookie("access");
+    if (!accessToken) {
+      throw new Error("Access Token이 쿠키에 없습니다.");
+    }
+
+    const response = await axios.post(
+      `${API_BASE_URL}/logout`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          access: accessToken,
+        },
+      }
+    );
 
     if (response.status === 200) {
       console.log("로그아웃 성공!");
-
-      // sessionStorage.removeItem("user");
       document.cookie = "access=; path=/; max-age=0;";
     } else {
       throw new Error("로그아웃 요청 실패");
@@ -128,3 +148,4 @@ export const logoutUser = async (): Promise<void> => {
     }
   }
 };
+
