@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
 import { Modal, message } from "antd";
-import { ExclamationCircleOutlined, RightOutlined} from "@ant-design/icons";
+import { ExclamationCircleOutlined, RightOutlined } from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productApi";
 import { uploadImages } from "@/services/api/imageUpload";
 import BackButton from "@/ui/components/common/BackButton";
@@ -22,6 +22,8 @@ const ProductRegisterForm: React.FC = () => {
   const [usedCondition, setUsedCondition] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [gender, setGender] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [inputTag, setInputTag] = useState("");
   //화살표 상태
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
@@ -33,15 +35,15 @@ const ProductRegisterForm: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       const previews = files.map((file) => URL.createObjectURL(file));
-      
+
       setImages((prev) => [...prev, ...previews]);
       setImageFiles((prev) => [...prev, ...files]);
-  
+
       e.target.value = "";
     }
   };
@@ -59,14 +61,26 @@ const ProductRegisterForm: React.FC = () => {
   const handleRemoveImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
-  
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  };  
+  };
+
+  const handleAddTag = () => {
+    const trimmed = inputTag.trim();
+    if (trimmed && !tags.includes(trimmed) && tags.length < 5) {
+      setTags((prev) => [...prev, trimmed]);
+      setInputTag("");
+    }
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setTags((prev) => prev.filter((t) => t !== tag));
+  };
 
   const handleSave = async () => {
-    if (!productName || !category || !subCategory || !price || 
+    if (!productName || !category || !subCategory || !price ||
       !productCondition || !gender
     ) {
       message.error("모든 필수 정보를 입력해주세요.");
@@ -77,14 +91,14 @@ const ProductRegisterForm: React.FC = () => {
     if (imageFiles.length > 0) {
       uploadedUrls = await uploadImages(imageFiles);
     }
-  
+
     const finalProductCondition = usedCondition || productCondition;
-  
+
     let finalSubCategory = subCategory;
     if (subCategory === "기타" || subCategory === "전체") {
       finalSubCategory = `${category}_${subCategory}`;
     }
-  
+
     const formData = {
       productName,
       category,
@@ -96,13 +110,14 @@ const ProductRegisterForm: React.FC = () => {
       images: uploadedUrls.length > 0 ? uploadedUrls : ["없음"],
       productCondition: finalProductCondition,
       productDescription,
+      tags,
     };
-  
+
     try {
       await registerProduct(formData);
       message.success("상품이 성공적으로 등록되었습니다.");
       images.forEach((src) => URL.revokeObjectURL(src));
-  
+
       setProductName("");
       setCategory("");
       setSubCategory("");
@@ -115,12 +130,12 @@ const ProductRegisterForm: React.FC = () => {
       setProductCondition("");
       setUsedCondition("");
       setProductDescription("");
-  
+
       router.push("/products/complete");
     } catch {
       message.error("상품 등록 중 오류가 발생했습니다.");
     }
-  };  
+  };
 
   return (
     <div className="max-w-md w-full bg-[var(--bg-white)] p-6 pb-10">
@@ -167,9 +182,8 @@ const ProductRegisterForm: React.FC = () => {
             ))}
           </select>
           <div
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-200 pointer-events-none text-[var(--text-gray)] ${
-              isCategoryOpen ? "rotate-90" : ""
-            }`}
+            className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-200 pointer-events-none text-[var(--text-gray)] ${isCategoryOpen ? "rotate-90" : ""
+              }`}
           >
             <RightOutlined />
           </div>
@@ -202,9 +216,8 @@ const ProductRegisterForm: React.FC = () => {
                 ))}
           </select>
           <div
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-200 pointer-events-none text-[var(--text-gray)] ${
-              isSubCategoryOpen ? "rotate-90" : ""
-            }`}
+            className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-200 pointer-events-none text-[var(--text-gray)] ${isSubCategoryOpen ? "rotate-90" : ""
+              }`}
           >
             <RightOutlined />
           </div>
@@ -237,11 +250,10 @@ const ProductRegisterForm: React.FC = () => {
         />
         <button
           onClick={handleFreeClick}
-          className={`flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium border whitespace-nowrap ${
-            isFree
-              ? "bg-[var(--bg-dark-gray)] text-[var(--text-white)] border-[var(--border-gray)]"
-              : "bg-[var(--bg-white)] text-[var(--text-dark-gray)] border-[var(--border-light-gray)]"
-          }`}
+          className={`flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium border whitespace-nowrap ${isFree
+            ? "bg-[var(--bg-dark-gray)] text-[var(--text-white)] border-[var(--border-gray)]"
+            : "bg-[var(--bg-white)] text-[var(--text-dark-gray)] border-[var(--border-light-gray)]"
+            }`}
           style={{ minWidth: "60px" }}
         >
           무료
@@ -271,11 +283,10 @@ const ProductRegisterForm: React.FC = () => {
           {["공용", "남성", "여성"].map((option) => (
             <button
               key={option}
-              className={`min-w-[100px] px-4 py-2 rounded-md text-sm font-medium border text-center ${
-                gender === option
-                  ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
-                  : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
-              }`}
+              className={`min-w-[100px] px-4 py-2 rounded-md text-sm font-medium border text-center ${gender === option
+                ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+                }`}
               onClick={() => setGender(option)}
             >
               {option}
@@ -323,11 +334,10 @@ const ProductRegisterForm: React.FC = () => {
             {["미개봉", "중고"].map((condition) => (
               <button
                 key={condition}
-                className={`px-4 py-2 rounded-md text-sm font-medium border ${
-                  productCondition === condition
-                    ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
-                    : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
-                }`}                
+                className={`px-4 py-2 rounded-md text-sm font-medium border ${productCondition === condition
+                  ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                  : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+                  }`}
                 onClick={() => setProductCondition(condition)}
               >
                 {condition}
@@ -358,11 +368,10 @@ const ProductRegisterForm: React.FC = () => {
                 {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
                   <button
                     key={condition}
-                    className={`px-4 py-2 rounded-md text-sm font-medium border ${
-                      usedCondition === condition
-                        ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
-                        : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
-                    }`}
+                    className={`px-4 py-2 rounded-md text-sm font-medium border ${usedCondition === condition
+                      ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                      : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+                      }`}
                     onClick={() => setUsedCondition(condition)}
                   >
                     {condition}
@@ -372,6 +381,47 @@ const ProductRegisterForm: React.FC = () => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* 상품 태그 */}
+      <div className="mb-6">
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">상품 태그명</label>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="bg-[var(--bg-light-gray)] px-3 py-1 rounded-full text-sm flex items-center"
+            >
+              <span>#{tag}</span>
+              <button
+                onClick={() => handleRemoveTag(tag)}
+                className="ml-2 text-gray-500 hover:text-red-500"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+        <div className="flex items-center mt-2">
+          <span className="text-gray-400 text-sm mr-2">#</span>
+          <input
+            type="text"
+            value={inputTag}
+            maxLength={30}
+            onChange={(e) => setInputTag(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddTag();
+              }
+            }}
+            placeholder="태그 입력 후 Enter"
+            className="flex-1 p-2 border border-[var(--border-light-gray)] rounded-md text-sm"
+          />
+        </div>
+        <p className="text-xs text-[var(--text-gray)] mt-1">
+          태그는 최대 5개까지 입력할 수 있어요.
+        </p>
       </div>
 
 
@@ -412,9 +462,8 @@ const ProductRegisterForm: React.FC = () => {
       {/* 저장 버튼 */}
       <button
         onClick={handleSave}
-        className={`w-full p-3 text-white rounded-md font-medium ${
-          productName && category && subCategory && price ? "bg-black" : "bg-gray-400"
-        }`}
+        className={`w-full p-3 text-white rounded-md font-medium ${productName && category && subCategory && price ? "bg-black" : "bg-gray-400"
+          }`}
         disabled={!productName || !category || !subCategory || !price}
       >
         저장하기
