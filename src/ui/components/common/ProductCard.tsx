@@ -26,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   const goToDetailPage = () => {
-    router.push(`/product/${product.id}`);
+    router.push(`/products/${product.id}`);
   };
 
   return (
