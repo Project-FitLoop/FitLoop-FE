@@ -8,7 +8,7 @@ interface PageProps {
 }
 
 export default async function ProductDetail({ params }: PageProps) {
-  const { id } = params;
+  const { id } = await params;
   const product = await fetchProductDetail(id);
 
   return (
