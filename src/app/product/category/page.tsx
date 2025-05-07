@@ -5,8 +5,12 @@ export default function CategoryPage() {
   return (
     <div
       id="scrollable-container"
-      className="flex h-full flex-col"
-      style={{ backgroundColor: "var(--bg-white)", overflowY: "auto", scrollBehavior: "smooth" }}
+      style={{
+        height: '100vh',
+        overflowY: 'auto',
+        scrollBehavior: 'smooth',
+      }}
+      className="scrollbar-hide"
     >
       <Category />
       <FloatingActionButton />
