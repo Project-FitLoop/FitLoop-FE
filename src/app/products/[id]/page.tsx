@@ -1,13 +1,15 @@
-export const dynamicParams = true;
+export const dynamic = 'force-dynamic';
 
 import ProductDetailPage from '@/ui/components/product/ProductDetailPage';
 import { fetchProductDetail } from '@/services/api/productApi';
 
-interface PageProps {
-  params: { id: string };
-}
+type PageParams = Promise<{ id: string }>;
 
-export default async function ProductDetail({ params }: PageProps) {
+export default async function ProductDetail({
+  params,
+}: {
+  params: PageParams;
+}) {
   const { id } = await params;
   const product = await fetchProductDetail(id);
 
