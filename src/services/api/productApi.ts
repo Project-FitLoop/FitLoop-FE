@@ -21,6 +21,7 @@ export interface ProductDetail extends ProductResponse {
   rating?: number;
   reviewCount?: number;
   condition?: string;
+  profileImages: string;
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;

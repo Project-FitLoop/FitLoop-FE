@@ -24,6 +24,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
         imageUrls = [],
         includeShipping,
         createdAt,
+        profileImages,
     } = product;
 
     const [showCarbonInfo, setShowCarbonInfo] = useState(false);
@@ -57,13 +58,23 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
             </button>
 
             {/* 판매자 정보 */}
-            <div className="flex items-center space-x-3 mb-3 mt-11">
-                <div className="w-24 h-24 rounded-full" style={{ background: 'var(--bg-gray)' }} />
+            <div className="flex items-center space-x-5 mb-5 mt-16">
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--bg-gray)] relative">
+                    {product.profileImages ? (
+                        <Image
+                            src={product.profileImages}
+                            alt="판매자 프로필"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 400px"
+                            className="object-cover"
+                        />
+                    ) : null}
+                </div>                
                 <div>
                     <p className="font-semibold text-base" style={{ color: 'var(--text-black)' }}>
                         {sellerName} 샵 <span className="ml-1">🌱</span>
                     </p>
-                    <p className="text-sm" style={{ color: 'var(--text-gray)' }}>
+                    <p className="text-base" style={{ color: 'var(--text-gray)' }}>
                         {'★'.repeat(rating)}{'☆'.repeat(5 - rating)} ({reviewCount})
                     </p>
                 </div>
