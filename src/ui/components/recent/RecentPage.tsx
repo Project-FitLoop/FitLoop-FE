@@ -48,7 +48,7 @@ const RecentPage: React.FC = () => {
 
   return (
     <div className="px-4 py-6">
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 justify-items-center">
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-4 justify-items-center">
         {products.map((product, index) => {
           const isLast = index === products.length - 1;
           return (
