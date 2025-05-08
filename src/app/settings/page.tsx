@@ -1,8 +1,27 @@
-import React from "react";
-import Settings from "@/ui/components/setting/setting"; // ✅ settings.tsx에서 UI 분리
+'use client';
+
+import React from 'react';
+import Settings from '@/ui/components/setting/setting';
 
 const SettingsPage: React.FC = () => {
-  return <Settings />;
+  return (
+    <div
+      id="scrollable-container"
+      className="scrollbar-hide"
+      style={{
+        height: '100vh',
+        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        scrollBehavior: 'smooth',
+        alignItems: 'center',
+      }}
+    >
+      <div style={{ width: '100%', maxWidth: '400px' }}>
+        <Settings />
+      </div>
+    </div>
+  );
 };
 
 export default SettingsPage;
