@@ -1,14 +1,18 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import BackButton from "@/ui/components/common/BackButton";
+import Image from 'next/image';
+import BackButton from '@/ui/components/common/BackButton';
 
-const Header = () => {
+interface HeaderProps {
+  title: string;
+}
+
+const Header = ({ title }: HeaderProps) => {
   return (
     <div className="flex items-center justify-between px-4 py-3 bg-white shadow-md">
       <div className="flex items-center space-x-2">
         <BackButton />
-        <span className="text-lg text-black font-medium">상품</span>
+        <span className="text-lg text-black font-medium">{title}</span>
       </div>
 
       <div className="flex space-x-4">
