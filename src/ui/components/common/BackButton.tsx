@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 
 interface BackButtonProps {
@@ -12,9 +12,12 @@ const BackButton: React.FC<BackButtonProps> = ({
   className = "",
 }) => {
   const router = useRouter();
+const pathname = usePathname();
 
   const handleBack = () => {
-    if (window.history.length > 1) {
+    if (pathname.startsWith("/product/category/")) {
+      router.push("/product/category");
+    } else if (window.history.length > 1) {
       router.back();
     } else {
       router.push("/");
