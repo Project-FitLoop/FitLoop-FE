@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const loginUser = async (
   username: string,
   password: string
-): Promise<{ accessToken: string; personalInfo: boolean }> => {
+): Promise<{ personalInfo: boolean }> => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/login`,
@@ -14,14 +14,9 @@ export const loginUser = async (
       { withCredentials: true }
     );
 
-    const accessToken = response.headers["access"];
-    if (!accessToken) {
-      throw new Error("Access Token이 응답 헤더에 없습니다.");
-    }
-
     const personalInfo = response.data.personal_info;
 
-    return { accessToken, personalInfo };
+    return { personalInfo };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error("로그인 실패:", error.response?.data?.message || error.message);
@@ -82,17 +77,27 @@ export const getGoogleLoginUrl = async (): Promise<string> => {
 //Access Token 재발급 요청
 export const reissueAccessToken = async (): Promise<string> => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/reissue`,
+    // 서버에 refresh 토큰 기반으로 재발급 요청
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/reissue`,
       {},
-      { withCredentials: true } //Refresh Token 쿠키 포함
+      { withCredentials: true }
     );
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-    //응답 헤더에서 Access Token 추출
-    const accessToken = response.headers["access"];
+    // 쿠키에서 새로 저장된 access 토큰을 꺼냄
+    const getCookie = (name: string): string | null => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+      return null;
+    };
+
+    const accessToken = getCookie("access");
     if (!accessToken) {
-      throw new Error("Access Token이 응답 헤더에 없습니다.");
+      throw new Error("Access 토큰이 쿠키에 없습니다.");
     }
+
     return accessToken;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -104,6 +109,7 @@ export const reissueAccessToken = async (): Promise<string> => {
     }
   }
 };
+
 
 // 쿠키에서 특정 이름의 값을 꺼내는 함수
 const getCookie = (name: string): string | null => {
