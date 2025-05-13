@@ -5,6 +5,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ProductDetail } from "@/services/api/productApi";
 import { CloseOutlined } from "@ant-design/icons";
+import { addToCart } from '@/services/api/cartApi';
+import { message } from "antd";
+
 
 interface ProductDetailPageProps {
   product: ProductDetail;
@@ -37,6 +40,14 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
   const toggleShippingInfo = () => setShowShippingInfo(!showShippingInfo);
   const toggleLike = () => setLiked(!liked);
   const handleGoBack = () => router.back();
+  const handleAddToCart = async () => {
+    try {
+      await addToCart(product.id);
+      message.success("장바구니에 담았습니다!");
+    } catch {
+      message.error("장바구니에 담지 못했습니다.");
+    }
+  };
 
   // 등록일 포맷
   const formattedDate = createdAt
@@ -285,6 +296,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
             color: "var(--text-black)",
             border: "1px solid var(--border-light-gray)",
           }}
+          onClick={handleAddToCart}
         >
           장바구니 담기
         </button>
