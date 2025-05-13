@@ -2,7 +2,7 @@ import axios from "axios";
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true, // 쿠키 포함 요청을 위해 필요
+  withCredentials: true,
 });
 
 // 쿠키에서 access 토큰 읽는 함수
@@ -49,7 +49,7 @@ instance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 401 Unauthorized + 재시도 안 했을 때만 실행
+    // 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -63,9 +63,8 @@ instance.interceptors.response.use(
 
         // 재요청
         return instance(originalRequest);
-      } catch (reissueError) {
+      } catch {
         refreshTokenRequest = null;
-        console.warn("토큰 재발급 실패 → 로그인 페이지로 이동");
         window.location.href = "/login?reason=session-expired";
       }
     }
