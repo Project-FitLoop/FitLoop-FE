@@ -14,12 +14,12 @@ const CategoryPage: React.FC = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const info = getCategoryInfoFromUrl(pathname, searchParams);
-  const paramString = searchParams.toString();
+  const searchParamString = searchParams.toString();
 
   useEffect(() => {
     setPage(0);
     setProducts([]);
-  }, [info?.selectedGender, searchParams.toString()]);
+  }, [info?.selectedGender, searchParamString]);
 
   const loadProducts = async (page: number) => {
     if (!info) return;

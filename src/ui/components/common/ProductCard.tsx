@@ -68,12 +68,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           (variant === "popular" || variant === "category") &&
           likeCount !== undefined
         ) && (
-            <div className="absolute top-0 right-0 text-[10px] font-semibold px-[6px] py-[2px] rounded-tr-md rounded-bl-md z-10 flex items-center gap-[2px]"
-              style={{ color: "var(--text-white)", backgroundColor: "var(--bg-dark-gray)" }}>
-              <HeartFilled className="text-[10px]" style={{ color: "var(--text-white)" }} />
-              {likeCount.toLocaleString()}명
-            </div>
-          )}
+          <div className="absolute top-0 right-0 text-[10px] font-semibold px-[6px] py-[2px] rounded-tr-md rounded-bl-md z-10 flex items-center gap-[2px]"
+            style={{ color: "var(--text-white)", backgroundColor: "var(--bg-dark-gray)" }}>
+            <HeartFilled className="text-[10px]" style={{ color: "var(--text-white)" }} />
+            {likeCount.toLocaleString()}명
+          </div>
+        )}
         {/* 좋아요 토글 버튼 */}
         <button
           onClick={(e) => {
