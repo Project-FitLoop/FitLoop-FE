@@ -395,32 +395,31 @@ const ProductRegisterForm: React.FC = () => {
             <RightOutlined className="ml-auto" />
           </div>
         </div>
-
-          {productCondition === "중고" && (
-            <div className="mt-6">
-              <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-                추가 중고 상품 상태 <span className="text-red-500">*</span>
-              </label>
-              <div className="flex space-x-2 mt-2">
-                {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
-                  <button
-                    key={condition}
-                    className={`px-4 py-2 rounded-md text-sm font-medium border ${
-                      usedCondition === condition
-                        ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
-                        : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
-                    }`}
-                    onClick={() => setUsedCondition(condition)}
-                  >
-                    {condition}
-                  </button>
-                ))}
-              </div>
-              {!usedCondition && (
-                <p className="text-xs text-red-500 mt-1">추가 상태를 선택해주세요.</p>
-              )}
+        {productCondition === "중고" && (
+          <div className="mt-6">
+            <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+              추가 중고 상품 상태 <span className="text-red-500">*</span>
+            </label>
+            <div className="flex space-x-2 mt-2">
+              {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
+                <button
+                  key={condition}
+                  className={`px-4 py-2 rounded-md text-sm font-medium border ${
+                    usedCondition === condition
+                      ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                      : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+                  }`}
+                  onClick={() => setUsedCondition(condition)}
+                >
+                  {condition}
+                </button>
+              ))}
             </div>
-          )}
+            {!usedCondition && (
+              <p className="text-xs text-red-500 mt-1">추가 상태를 선택해주세요.</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 상품 태그 */}
