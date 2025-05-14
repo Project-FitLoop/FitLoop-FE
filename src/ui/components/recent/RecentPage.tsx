@@ -54,6 +54,7 @@ const RecentPage: React.FC = () => {
           return (
             <div key={product.id} ref={isLast ? lastProductRef : null}>
               <ProductCard
+                variant="recent"
                 product={{
                   id: product.id,
                   name: product.name,
@@ -70,7 +71,7 @@ const RecentPage: React.FC = () => {
       </div>
       {loading && <p className="text-center mt-4">로딩 중...</p>}
       {!hasMore && (
-        <p className="text-center mt-4 text-gray-400">
+        <p className="text-center mt-4" style={{color: "var(--text-dark-gray)"}}>
           모든 상품을 불러왔습니다.
         </p>
       )}
