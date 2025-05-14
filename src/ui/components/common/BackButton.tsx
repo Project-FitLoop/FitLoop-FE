@@ -12,7 +12,7 @@ const BackButton: React.FC<BackButtonProps> = ({
   className = "",
 }) => {
   const router = useRouter();
-const pathname = usePathname();
+  const pathname = usePathname();
 
   const handleBack = () => {
     if (pathname.startsWith("/product/category/")) {
@@ -27,7 +27,7 @@ const pathname = usePathname();
   return (
     <button
       onClick={handleBack}
-      className={`flex items-center text-lg font-bold text-gray-800 ${className}`}
+      className={`flex items-center text-lg font-bold ${className}`}
     >
       <Image src={imageSrc} alt="뒤로 가기" width={20} height={20} className="mr-2" />
     </button>
