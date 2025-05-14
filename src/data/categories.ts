@@ -32,7 +32,7 @@ export const subCategories: { [key: string]: { name: string; code: string }[] } 
     outerwear: [
         { name: "전체", code: "000"},
         { name: "숏패딩/헤비아우터", code: "001" },
-        { name: "무스탕 / 퍼", code: "002" },
+        { name: "무스탕/퍼", code: "002" },
         { name: "후드 집업", code: "003" },
         { name: "블루종", code: "004" },
         { name: "레더/라이더스재킷", code: "005" },
