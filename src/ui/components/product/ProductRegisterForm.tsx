@@ -86,7 +86,8 @@ const ProductRegisterForm: React.FC = () => {
       !subCategory ||
       !price ||
       !productCondition ||
-      !gender
+      !gender ||
+      (productCondition === "중고" && !usedCondition)
     ) {
       message.error("모든 필수 정보를 입력해주세요.");
       return;
@@ -395,12 +396,10 @@ const ProductRegisterForm: React.FC = () => {
           </div>
         </div>
 
-        {productCondition === "중고" && (
-          <div className="mt-2">
-            {/* 추가 중고 상품 상태 */}
+          {productCondition === "중고" && (
             <div className="mt-6">
               <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-                추가 중고 상품 상태
+                추가 중고 상품 상태 <span className="text-red-500">*</span>
               </label>
               <div className="flex space-x-2 mt-2">
                 {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
@@ -417,9 +416,11 @@ const ProductRegisterForm: React.FC = () => {
                   </button>
                 ))}
               </div>
+              {!usedCondition && (
+                <p className="text-xs text-red-500 mt-1">추가 상태를 선택해주세요.</p>
+              )}
             </div>
-          </div>
-        )}
+          )}
       </div>
 
       {/* 상품 태그 */}
