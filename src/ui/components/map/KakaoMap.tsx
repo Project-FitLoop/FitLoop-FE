@@ -4,12 +4,14 @@ import { useEffect } from 'react';
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     kakao: any;
   }
 }
 
 export default function KakaoMap() {
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const markers: any[] = [];
 
     const loadMap = async () => {
@@ -40,6 +42,7 @@ export default function KakaoMap() {
             markers.length = 0;
 
             // 마커 다시 생성
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data.documents.forEach((place: any) => {
               const marker = new window.kakao.maps.Marker({
                 map,
