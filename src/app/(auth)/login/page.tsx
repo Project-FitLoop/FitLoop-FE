@@ -14,7 +14,7 @@ export default function LoginPage() {
         alignItems: "center",
       }}
     >
-      <div style={{ width: "100%", maxWidth: "400px" }}>
+      <div style={{ width: "100%", maxWidth: "393px" }}>
         <LoginForm />
       </div>
     </div>
