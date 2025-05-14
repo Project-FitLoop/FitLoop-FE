@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Form, Input, Button, Checkbox, Divider, Typography, message } from 'antd';
 import Image from 'next/image';
@@ -71,9 +72,9 @@ export default function LoginPage() {
             <Title level={3} className="!text-xl !mb-2 font-bold text-gray-800">로그인</Title>
             <Text className="text-sm text-gray-600">
               아직 회원이 아니신가요?{' '}
-              <a href="/register" className="text-blue-600 font-semibold hover:underline">
+              <Link href="/register" className="text-blue-600 font-semibold hover:underline">
                 회원가입
-              </a>
+              </Link>
             </Text>
           </div>
 
@@ -113,9 +114,9 @@ export default function LoginPage() {
             <Form.Item name="remember" valuePropName="checked" className="!mb-1">
               <div className="flex justify-between items-center text-gray-600">
                 <Checkbox className="text-gray-700">자동 로그인</Checkbox>
-                <a href="/forgot-password" className="text-sm text-gray-500 hover:underline">
+                <Link href="/forgot-password" className="text-sm text-gray-500 hover:underline">
                   비밀번호 찾기
-                </a>
+                </Link>
               </div>
             </Form.Item>
 
