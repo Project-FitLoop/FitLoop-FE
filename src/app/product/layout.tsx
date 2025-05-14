@@ -6,7 +6,7 @@ export default function ProductLayout({ children }: { children: React.ReactNode 
     <div className="flex justify-center bg-[color:var(--bg-white)] min-h-screen">
       <div className="w-full max-w-[400px] flex flex-col h-screen bg-white">
         {/* 상단 헤더 */}
-        <Header />
+        <Header title="상품" />
 
         {/* 인기 / 최근 등록 / 카테고리별 탭 */}
         <FilterTabs />
