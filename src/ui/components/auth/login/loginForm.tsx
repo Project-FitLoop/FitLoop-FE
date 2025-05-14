@@ -46,9 +46,20 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="flex justify-center items-center bg-gray-50 min-h-screen px-4">
+    <div className="flex justify-center bg-gray-50 h-auto min-h-screen px-4">
       <div className="w-full max-w-sm">
-        {/* 헤더 영역 */}
+        {/* 로고 */}
+        <div className="flex justify-center mb-2">
+          <Image
+            src="/assets/loginform/login_logo.svg"
+            alt="Login Logo"
+            width={120}
+            height={40}
+            priority
+          />
+        </div>
+
+        {/* 헤더 */}
         <div className="text-center mb-6">
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">FITLOOP</h1>
           <p className="text-sm text-gray-500 mt-1">자연을 입다, 감성을 나누다</p>
