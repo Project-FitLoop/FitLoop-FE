@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Header from "@/ui/components/header/Header";
-import CategoryHeader from "@/ui/components/header/CategoryHeader"; // 새로 추가
+import CategoryHeader from "@/ui/components/header/CategoryHeader"; 
 import FilterTabs from "@/ui/components/header/FilterTabs";
 import CategoryFilterTabs from "@/ui/components/header/CategoryFilterTab";
 
@@ -14,8 +14,8 @@ export default function ProductLayout({ children }: { children: React.ReactNode 
   return (
     <div className="flex justify-center bg-[color:var(--bg-white)] min-h-screen">
       <div className="w-full max-w-[400px] flex flex-col h-screen bg-white">
-        {/* 상단 헤더: 경로에 따라 분기 */}
-        {isCategoryPage ? <CategoryHeader /> : <Header />}
+        {/* 상단 헤더 */}
+        {isCategoryPage ? <CategoryHeader /> : <Header title="상품" />}
 
         {/* 필터 탭: 경로에 따라 분기 */}
         {isCategoryPage ? <CategoryFilterTabs /> : <FilterTabs />}

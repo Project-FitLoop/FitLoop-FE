@@ -49,7 +49,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* 이미지 영역 */}
       <div className="w-full aspect-[3/4] bg-[var(--background)] flex items-center justify-center relative transition-all duration-300 ease-in-out">
         <Image
-          src={product.imageUrl || "/assets/default.png"}
+          src={
+            !product.imageUrl || product.imageUrl === '없음'
+              ? '/assets/product/no-image.png'
+              : product.imageUrl
+          }
           alt={product.name}
           width={200}
           height={200}

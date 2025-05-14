@@ -1,18 +1,22 @@
 import axios from "axios";
-import { message } from "antd";
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  // HttpOnly 쿠키 포함
-  withCredentials: true, 
+  withCredentials: true,
 });
 
-//모든 요청에 access 토큰 자동 포함
+// 쿠키에서 access 토큰 읽는 함수
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+  return null;
+};
+
+// 요청 인터셉터: 모든 요청에 access 토큰 자동 추가
 instance.interceptors.request.use(
   (config) => {
-    const match = document.cookie.match(/(?:^|; )access=([^;]*)/);
-    const accessToken = match ? match[1] : null;
-
+    const accessToken = getCookie("access");
     if (accessToken) {
       config.headers["access"] = accessToken;
     }
@@ -21,37 +25,47 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Access Token 자동 갱신 (Interceptor)
+// 중복 방지를 위한 refreshToken 재발급 요청 잠금 변수
+let refreshTokenRequest: Promise<void> | null = null;
+
+// access 토큰 재발급 요청 (쿠키 기반)
+async function reissueAccessToken(): Promise<void> {
+  try {
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/reissue`,
+      {},
+      { withCredentials: true }
+    );
+    console.log("access 토큰 재발급 성공");
+  } catch (error) {
+    console.error("access 토큰 재발급 실패:", error);
+    throw new Error("토큰 재발급 실패");
+  }
+}
+
+// 응답 인터셉터: access 토큰 만료 시 자동 재요청 처리
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    // 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const res = await axios.post(
-          `${instance.defaults.baseURL}/reissue`,
-          {},
-          { withCredentials: true }
-        );
-
-        const newAccessToken = res.headers["access"];
-        if (!newAccessToken) {
-          throw new Error("Access Token이 응답 헤더에 없습니다.");
+        // 중복 요청 방지
+        if (!refreshTokenRequest) {
+          refreshTokenRequest = reissueAccessToken();
         }
+        await refreshTokenRequest;
+        refreshTokenRequest = null;
 
-        document.cookie = `access=${newAccessToken}; path=/;`;
-
-        instance.defaults.headers.common["access"] = newAccessToken;
-        originalRequest.headers["access"] = newAccessToken;
-
+        // 재요청
         return instance(originalRequest);
-      } catch (refreshError) {
-        message.error("세션이 만료되었습니다. 다시 로그인해주세요.");
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
+      } catch {
+        refreshTokenRequest = null;
+        window.location.href = "/login?reason=session-expired";
       }
     }
 
