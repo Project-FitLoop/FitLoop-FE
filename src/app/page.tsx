@@ -1,12 +1,5 @@
-import React from 'react';
-import LoadingWrapper from '@/components/loadingWrapper';
+import { redirect } from 'next/navigation';
 
-const MainPage = () => {
-  return (
-    <div>
-      <LoadingWrapper />
-    </div>
-  );
-};
-
-export default MainPage;
+export default function MainIndex() {
+  redirect('/main/home');
+}
