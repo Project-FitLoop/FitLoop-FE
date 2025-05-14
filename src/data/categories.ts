@@ -1,4 +1,10 @@
 /* eslint-disable */
+export const genderOptions = [
+  { label: "전체", value: "A" },
+  { label: "남성", value: "M" },
+  { label: "여성", value: "F" }
+];
+
 export const categories = [
     { name: "신발", id: "shoes", code: "001", gender: "all" },
     { name: "아우터", id: "outerwear", code: "002", gender: "all" },

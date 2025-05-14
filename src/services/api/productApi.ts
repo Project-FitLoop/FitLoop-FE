@@ -1,6 +1,6 @@
 /* eslint-disable */
-import axios from 'axios';
-import { instance } from '@/config/apiConfig';
+import axios from "axios";
+import { instance } from "@/config/apiConfig";
 
 export interface ProductResponse {
   id: number;
@@ -27,9 +27,36 @@ export interface ProductDetail extends ProductResponse {
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // 최근 상품 조회 (axios 기본 인스턴스 사용)
-export const fetchRecentProducts = async (page: number, size = 9): Promise<ProductResponse[]> => {
+export const fetchRecentProducts = async (
+  page: number,
+  size = 9
+): Promise<ProductResponse[]> => {
   const response = await axios.get<ProductResponse[]>(
     `${BASE_URL}/products/recent?page=${page}&size=${size}`
+  );
+  return response.data;
+};
+
+// 인기 상품 조회 (axios 기본 인스턴스 사용)
+export const fetchPopularProducts = async (
+  page: number,
+  size = 9
+): Promise<ProductResponse[]> => {
+  const response = await axios.get<ProductResponse[]>(
+    `${BASE_URL}/products/popular?page=${page}&size=${size}`
+  );
+  return response.data;
+};
+
+// 카테고리 상품 조회 (axios 기본 인스턴스 사용)
+export const fetchCategoryProducts = async (
+  page: number,
+  categoryCode: string,
+  gender: string,
+  size = 9
+): Promise<ProductResponse[]> => {
+  const response = await axios.get<ProductResponse[]>(
+    `${BASE_URL}/products/category?page=${page}&size=${size}&categoryCode=${categoryCode}&gender=${gender}`
   );
   return response.data;
 };

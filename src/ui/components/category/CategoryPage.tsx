@@ -1,19 +1,35 @@
 'use client';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ProductCard from '@/ui/components/common/ProductCard';
-import { fetchRecentProducts, ProductResponse } from '@/services/api/productApi';
+import { fetchCategoryProducts, ProductResponse } from '@/services/api/productApi';
+import { usePathname, useSearchParams } from "next/navigation";
+import { getCategoryInfoFromUrl } from "@/data/getCategoryInfo";
 
-const RecentPage: React.FC = () => {
+const CategoryPage: React.FC = () => {
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const observer = useRef<IntersectionObserver | null>(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const info = getCategoryInfoFromUrl(pathname, searchParams);
+  const searchParamString = searchParams.toString();
+
+  useEffect(() => {
+    setPage(0);
+    setProducts([]);
+  }, [info?.selectedGender, searchParamString]);
 
   const loadProducts = async (page: number) => {
+    if (!info) return;
     setLoading(true);
     try {
-      const newProducts = await fetchRecentProducts(page);
+      const newProducts = await fetchCategoryProducts(
+        page,
+        info.categoryCode + info.selectedSubCategoryCode,
+        info.selectedGender ?? ''
+      );
       setProducts((prev) => {
         const ids = new Set(prev.map((p) => p.id));
         const uniqueNew = newProducts.filter((p) => !ids.has(p.id));
@@ -30,7 +46,7 @@ const RecentPage: React.FC = () => {
   useEffect(() => {
     if (!loading) loadProducts(page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page, info?.selectedGender]);
 
   const lastProductRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -54,15 +70,14 @@ const RecentPage: React.FC = () => {
           return (
             <div key={product.id} ref={isLast ? lastProductRef : null}>
               <ProductCard
-                variant="recent"
+                variant="category"
+                likeCount={product.likeCount}
                 product={{
                   id: product.id,
                   name: product.name,
                   imageUrl: product.imageUrls?.[0] ?? '/assets/default.png',
                   tags: product.tags ?? [],
-                  price: product.free
-                    ? '무료나눔'
-                    : `${product.price.toLocaleString()}원`,
+                  price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
                 }}
               />
             </div>
@@ -71,7 +86,9 @@ const RecentPage: React.FC = () => {
       </div>
       {loading && <p className="text-center mt-4">로딩 중...</p>}
       {!hasMore && (
-        <p className="text-center mt-4" style={{color: "var(--text-dark-gray)"}}>
+        <p
+          className="text-center mt-4"
+          style={{ color: "var(--text-gray)" }}>
           모든 상품을 불러왔습니다.
         </p>
       )}
@@ -79,4 +96,4 @@ const RecentPage: React.FC = () => {
   );
 };
 
-export default RecentPage;
+export default CategoryPage;

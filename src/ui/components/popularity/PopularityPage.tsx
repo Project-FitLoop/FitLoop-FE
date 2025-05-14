@@ -1,9 +1,9 @@
 'use client';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ProductCard from '@/ui/components/common/ProductCard';
-import { fetchRecentProducts, ProductResponse } from '@/services/api/productApi';
+import { fetchPopularProducts, ProductResponse } from '@/services/api/productApi';
 
-const RecentPage: React.FC = () => {
+const PopularityPage: React.FC = () => {
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -13,7 +13,7 @@ const RecentPage: React.FC = () => {
   const loadProducts = async (page: number) => {
     setLoading(true);
     try {
-      const newProducts = await fetchRecentProducts(page);
+      const newProducts = await fetchPopularProducts(page);
       setProducts((prev) => {
         const ids = new Set(prev.map((p) => p.id));
         const uniqueNew = newProducts.filter((p) => !ids.has(p.id));
@@ -54,15 +54,15 @@ const RecentPage: React.FC = () => {
           return (
             <div key={product.id} ref={isLast ? lastProductRef : null}>
               <ProductCard
-                variant="recent"
+                variant="popular"
+                rank={index + 1}
+                likeCount={product.likeCount}
                 product={{
                   id: product.id,
                   name: product.name,
                   imageUrl: product.imageUrls?.[0] ?? '/assets/default.png',
                   tags: product.tags ?? [],
-                  price: product.free
-                    ? '무료나눔'
-                    : `${product.price.toLocaleString()}원`,
+                  price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
                 }}
               />
             </div>
@@ -79,4 +79,4 @@ const RecentPage: React.FC = () => {
   );
 };
 
-export default RecentPage;
+export default PopularityPage;
