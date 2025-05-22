@@ -97,7 +97,12 @@ export default function MainPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {recentProducts.map((product) => (
-              <div key={product.id} className="rounded-md shadow-sm overflow-hidden w-full" style={{ background: 'var(--bg-white)' }}>
+              <Link
+                href={`/products/${product.id}`}
+                key={product.id}
+                className="block rounded-md shadow-sm overflow-hidden w-full"
+                style={{ background: 'var(--bg-white)' }}
+              >
                 <div className="flex flex-col h-full">
                   <div className="w-full aspect-square overflow-hidden rounded-md">
                     <Image
@@ -135,7 +140,7 @@ export default function MainPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -186,8 +191,6 @@ export default function MainPage() {
           </div>
         </div>
       </section>
-
-
 
       {/* 오프라인 매장 위치 */}
       <section className="my-6 -mx-4">
