@@ -36,9 +36,7 @@ async function reissueAccessToken(): Promise<void> {
       {},
       { withCredentials: true }
     );
-    console.log("access 토큰 재발급 성공");
-  } catch (error) {
-    console.error("access 토큰 재발급 실패:", error);
+  } catch {
     throw new Error("토큰 재발급 실패");
   }
 }
