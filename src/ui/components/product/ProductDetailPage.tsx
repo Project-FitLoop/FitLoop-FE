@@ -52,13 +52,13 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
 
   const formattedDate = createdAt
     ? new Date(createdAt)
-        .toLocaleDateString("ko-KR", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        })
-        .replace(/\.\s/g, ".")
-        .replace(/\.$/, "")
+      .toLocaleDateString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+      .replace(/\.\s/g, ".")
+      .replace(/\.$/, "")
     : "";
 
   return (
