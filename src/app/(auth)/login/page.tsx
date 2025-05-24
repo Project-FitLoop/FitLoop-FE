@@ -1,10 +1,22 @@
 import LoginForm from '@/ui/components/auth/login/loginForm';
-const LoginPage = () => {
+
+export default function LoginPage() {
   return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <LoginForm />
+    <div
+      id="scrollable-container"
+      className="scrollbar-hide"
+      style={{
+        height: "100vh",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        scrollBehavior: "smooth",
+        alignItems: "center",
+      }}
+    >
+      <div style={{ width: "100%", maxWidth: "400px" }}>
+        <LoginForm />
+      </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

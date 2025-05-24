@@ -59,3 +59,10 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+.ant-carousel .slick-dots li button {
+  background: #d1d5db !important;
+}
+.ant-carousel .slick-dots li.slick-active button {
+  background: #6b7280 !important;
+}

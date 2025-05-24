@@ -1,4 +1,8 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
+
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -9,7 +13,7 @@ const instance = axios.create({
 const getCookie = (name: string): string | null => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+  if (parts.length === 2) return parts.pop()!.split(";").shift() || null;
   return null;
 };
 
@@ -18,6 +22,7 @@ instance.interceptors.request.use(
   (config) => {
     const accessToken = getCookie("access");
     if (accessToken) {
+      config.headers = config.headers || {};
       config.headers["access"] = accessToken;
     }
     return config;
@@ -31,14 +36,8 @@ let refreshTokenRequest: Promise<void> | null = null;
 // access 토큰 재발급 요청 (쿠키 기반)
 async function reissueAccessToken(): Promise<void> {
   try {
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/reissue`,
-      {},
-      { withCredentials: true }
-    );
-    console.log("access 토큰 재발급 성공");
-  } catch (error) {
-    console.error("access 토큰 재발급 실패:", error);
+    await instance.post("/reissue");
+  } catch {
     throw new Error("토큰 재발급 실패");
   }
 }
@@ -47,20 +46,17 @@ async function reissueAccessToken(): Promise<void> {
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config as CustomAxiosRequestConfig;
 
-    // 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // 중복 요청 방지
         if (!refreshTokenRequest) {
           refreshTokenRequest = reissueAccessToken();
         }
         await refreshTokenRequest;
         refreshTokenRequest = null;
-
         // 재요청
         return instance(originalRequest);
       } catch {

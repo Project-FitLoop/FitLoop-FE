@@ -74,43 +74,6 @@ export const getGoogleLoginUrl = async (): Promise<string> => {
   }
 };
 
-//Access Token 재발급 요청
-export const reissueAccessToken = async (): Promise<string> => {
-  try {
-    // 서버에 refresh 토큰 기반으로 재발급 요청
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/reissue`,
-      {},
-      { withCredentials: true }
-    );
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    // 쿠키에서 새로 저장된 access 토큰을 꺼냄
-    const getCookie = (name: string): string | null => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
-      return null;
-    };
-
-    const accessToken = getCookie("access");
-    if (!accessToken) {
-      throw new Error("Access 토큰이 쿠키에 없습니다.");
-    }
-
-    return accessToken;
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      console.error("Access Token 갱신 실패:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || "토큰 갱신 요청 실패");
-    } else {
-      console.error("Access Token 갱신 실패: 알 수 없는 오류", error);
-      throw new Error("알 수 없는 오류가 발생했습니다.");
-    }
-  }
-};
-
-
 // 쿠키에서 특정 이름의 값을 꺼내는 함수
 const getCookie = (name: string): string | null => {
   const value = `; ${document.cookie}`;

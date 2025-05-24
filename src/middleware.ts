@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -14,22 +13,23 @@ const protectedRoutes = [
 
 export function middleware(req: NextRequest) {
   const accessToken = req.cookies.get("access")?.value;
+  const refreshToken = req.cookies.get("refresh")?.value;
   const { pathname } = req.nextUrl;
 
-  // reissue 요청은 제외
+  // reissue는 항상 허용
   if (pathname === "/reissue") return NextResponse.next();
 
+  // 보호된 페이지 여부 확인
   const isProtected = protectedRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
 
-  if (!accessToken && isProtected) {
+  if (!refreshToken && isProtected) {
     const redirectUrl = `/login?redirect=${pathname}&reason=session-expired`;
     return NextResponse.redirect(new URL(redirectUrl, req.url));
   }
 
-  // 로그인 상태인데 /login으로 접근하면 마이페이지로 이동
-  if (accessToken && pathname === "/login") {
+  if ((accessToken || refreshToken) && pathname === "/login") {
     return NextResponse.redirect(new URL("/mypage", req.url));
   }
 

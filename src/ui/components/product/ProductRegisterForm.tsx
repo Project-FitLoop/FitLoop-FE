@@ -86,7 +86,8 @@ const ProductRegisterForm: React.FC = () => {
       !subCategory ||
       !price ||
       !productCondition ||
-      !gender
+      !gender ||
+      (productCondition === "중고" && !usedCondition)
     ) {
       message.error("모든 필수 정보를 입력해주세요.");
       return;
@@ -155,7 +156,7 @@ const ProductRegisterForm: React.FC = () => {
       {/* 상품명 */}
       <div className="mb-10">
         <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-          상품명
+          <span className="text-red-500 mr-1">*</span>상품명
         </label>
         <input
           type="text"
@@ -170,7 +171,7 @@ const ProductRegisterForm: React.FC = () => {
       {/* 대 카테고리 */}
       <div className="mb-1">
         <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-          카테고리
+          <span className="text-red-500 mr-1">*</span>카테고리
         </label>
         <div className="relative mt-1">
           <select
@@ -203,7 +204,7 @@ const ProductRegisterForm: React.FC = () => {
       {/* 중 카테고리 */}
       <div className="mb-10">
         <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-          상세 카테고리
+          <span className="text-red-500 mr-1">*</span>상세 카테고리
         </label>
         <div className="relative mt-1">
           <select
@@ -238,7 +239,7 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 판매 가격 */}
       <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-        판매가격
+        <span className="text-red-500 mr-1">*</span>판매가격
       </label>
       <div className="mb-1 flex items-center space-x-2">
         <input
@@ -305,7 +306,7 @@ const ProductRegisterForm: React.FC = () => {
       {/* 사용대상 */}
       <div className="mb-10">
         <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-          사용대상
+          <span className="text-red-500 mr-1">*</span>사용대상
         </label>
         <div className="flex justify-center space-x-2 mt-2">
           {["공용", "남성", "여성"].map((option) => (
@@ -365,7 +366,7 @@ const ProductRegisterForm: React.FC = () => {
       <div className="mb-10">
         <div>
           <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-            상품상태
+            <span className="text-red-500 mr-1">*</span>상품상태
           </label>
           <div className="flex space-x-2 mt-2">
             {["미개봉", "중고"].map((condition) => (
@@ -394,30 +395,29 @@ const ProductRegisterForm: React.FC = () => {
             <RightOutlined className="ml-auto" />
           </div>
         </div>
-
         {productCondition === "중고" && (
-          <div className="mt-2">
-            {/* 추가 중고 상품 상태 */}
-            <div className="mt-6">
-              <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-                추가 중고 상품 상태
-              </label>
-              <div className="flex space-x-2 mt-2">
-                {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
-                  <button
-                    key={condition}
-                    className={`px-4 py-2 rounded-md text-sm font-medium border ${
-                      usedCondition === condition
-                        ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
-                        : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
-                    }`}
-                    onClick={() => setUsedCondition(condition)}
-                  >
-                    {condition}
-                  </button>
-                ))}
-              </div>
+          <div className="mt-6">
+            <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+              <span className="text-red-500 mr-1">*</span>추가 중고 상품 상태
+            </label>
+            <div className="flex space-x-2 mt-2">
+              {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
+                <button
+                  key={condition}
+                  className={`px-4 py-2 rounded-md text-sm font-medium border ${
+                    usedCondition === condition
+                      ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                      : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+                  }`}
+                  onClick={() => setUsedCondition(condition)}
+                >
+                  {condition}
+                </button>
+              ))}
             </div>
+            {!usedCondition && (
+              <p className="text-xs text-red-500 mt-1">추가 상태를 선택해주세요.</p>
+            )}
           </div>
         )}
       </div>
@@ -503,11 +503,25 @@ const ProductRegisterForm: React.FC = () => {
       <button
         onClick={handleSave}
         className={`w-full p-3 text-white rounded-md font-medium ${
-          productName && category && subCategory && price
+          productName &&
+          category &&
+          subCategory &&
+          price &&
+          productCondition &&
+          gender &&
+          (productCondition !== "중고" || usedCondition)
             ? "bg-black"
             : "bg-gray-400"
         }`}
-        disabled={!productName || !category || !subCategory || !price}
+        disabled={
+          !productName ||
+          !category ||
+          !subCategory ||
+          !price ||
+          !productCondition ||
+          !gender ||
+          (productCondition === "중고" && !usedCondition)
+        }
       >
         저장하기
       </button>

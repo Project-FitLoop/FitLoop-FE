@@ -48,7 +48,7 @@ export default function CompleteRegister() {
           다른 상품 올리기
         </button>
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/main/home")}
           className="bg-[color:var(--bg-gray)] text-[color:var(--text-black)] px-5 py-2 rounded-full"
         >
           홈으로 돌아가기
