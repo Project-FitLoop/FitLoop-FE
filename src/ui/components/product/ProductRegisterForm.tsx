@@ -204,7 +204,7 @@ const ProductRegisterForm: React.FC = () => {
       {/* 중 카테고리 */}
       <div className="mb-10">
         <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-          상세 카테고리
+          <span className="text-red-500 mr-1">*</span>상세 카테고리
         </label>
         <div className="relative mt-1">
           <select
