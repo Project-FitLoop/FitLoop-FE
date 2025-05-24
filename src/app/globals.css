@@ -61,8 +61,8 @@ body {
 }
 
 .ant-carousel .slick-dots li button {
-  background: #d1d5db !important; /* Tailwind의 gray-300 */
+  background: #d1d5db !important;
 }
 .ant-carousel .slick-dots li.slick-active button {
-  background: #6b7280 !important; /* Tailwind의 gray-500 */
+  background: #6b7280 !important;
 }
