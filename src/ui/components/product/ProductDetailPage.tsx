@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { ProductDetail } from "@/services/api/productApi";
 import { CloseOutlined } from "@ant-design/icons";
 import { addToCart } from '@/services/api/cartApi';
-import { message } from "antd";
-
+import { message, Carousel, Modal } from "antd";
 
 interface ProductDetailPageProps {
   product: ProductDetail;
@@ -33,6 +32,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
   const [showConditionGuide, setShowConditionGuide] = useState(false);
   const [showShippingInfo, setShowShippingInfo] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [fullscreenVisible, setFullscreenVisible] = useState(false);
+  const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const router = useRouter();
 
   const toggleCarbon = () => setShowCarbonInfo(!showCarbonInfo);
@@ -49,7 +50,6 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
     }
   };
 
-  // 등록일 포맷
   const formattedDate = createdAt
     ? new Date(createdAt)
       .toLocaleDateString("ko-KR", {
@@ -62,10 +62,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
     : "";
 
   return (
-    <div
-      className="relative flex flex-col min-h-screen px-4 pt-4 pb-24"
-      style={{ background: "var(--bg-white)", color: "var(--text-black)" }}
-    >
+    <div className="relative flex flex-col min-h-screen px-4 pt-4 pb-24" style={{ background: "var(--bg-white)", color: "var(--text-black)" }}>
       {/* 뒤로가기 버튼 */}
       <button
         onClick={handleGoBack}
@@ -78,7 +75,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
       {/* 판매자 정보 */}
       <div className="flex items-center space-x-5 mb-5 mt-16">
         <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--bg-gray)] relative">
-          {product.profileImages ? (
+          {product.profileImages && (
             <Image
               src={product.profileImages}
               alt="판매자 프로필"
@@ -86,39 +83,71 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
               sizes="(max-width: 768px) 100vw, 400px"
               className="object-cover"
             />
-          ) : null}
+          )}
         </div>
         <div>
-          <p
-            className="font-semibold text-base"
-            style={{ color: "var(--text-black)" }}
-          >
+          <p className="font-semibold text-base">
             {sellerName} 샵 <span className="ml-1">🌱</span>
           </p>
-          <p className="text-base" style={{ color: "var(--text-gray)" }}>
+          <p className="text-base text-gray-500">
             {"★".repeat(rating)}
             {"☆".repeat(5 - rating)} ({reviewCount})
           </p>
         </div>
       </div>
 
-      {/* 이미지 */}
-      <div
-        className="relative w-full aspect-[4/4] rounded-lg mb-1 overflow-hidden"
-        style={{ background: "var(--bg-gray)" }}
-      >
-        {imageUrls.map((url, index) => (
-          <Image
-            key={index}
-            src={url}
-            alt={`product image ${index + 1}`}
-            fill
-            className="object-cover"
-          />
-        ))}
+      {/* 이미지 슬라이더 */}
+      <div className="w-full max-w-md mx-auto aspect-square mb-2">
+        <Carousel
+          dots
+          swipeToSlide
+          draggable
+          autoplay={false}
+          afterChange={(i) => setFullscreenIndex(i)}
+        >
+          {imageUrls.map((url, index) => (
+            <div
+              key={index}
+              className="relative w-full h-0 pb-[100%] bg-white cursor-pointer"
+              onClick={() => {
+                setFullscreenIndex(index);
+                setFullscreenVisible(true);
+              }}
+            >
+              <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                <Image
+                  src={url}
+                  alt={`product image ${index + 1}`}
+                  width={500}
+                  height={500}
+                  className="object-contain max-h-full"
+                />
+              </div>
+            </div>
+          ))}
+        </Carousel>
       </div>
 
-      {/* 등록일 (이미지 바로 아래 우측 정렬) */}
+      {/* 전체 화면 단일 이미지 보기 (Carousel 제거) */}
+      <Modal
+        open={fullscreenVisible}
+        footer={null}
+        onCancel={() => setFullscreenVisible(false)}
+        styles={{ body: { padding: 0, background: '#000' } }}
+        width="90%"
+        centered
+      >
+        <div className="w-full h-full flex items-center justify-center">
+          <Image
+            src={imageUrls[fullscreenIndex]}
+            alt={`fullscreen image ${fullscreenIndex + 1}`}
+            width={800}
+            height={800}
+            className="object-contain max-h-[80vh]"
+          />
+        </div>
+      </Modal>
+      {/* 나머지 상품 정보 UI는 그대로 유지 */}
       {formattedDate && (
         <div className="w-full flex justify-end mb-2">
           <p className="text-xs" style={{ color: "var(--text-gray)" }}>
