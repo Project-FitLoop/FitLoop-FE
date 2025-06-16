@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
+import { logoutUser } from "@/services/api/auth";
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
@@ -10,7 +11,8 @@ const instance = axios.create({
 });
 
 // 쿠키에서 access 토큰 읽는 함수
-const getCookie = (name: string): string | null => {
+export const getCookie = (name: string): string | null => {
+  if (typeof window === "undefined") return null;
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop()!.split(";").shift() || null;
@@ -37,7 +39,17 @@ let refreshTokenRequest: Promise<void> | null = null;
 async function reissueAccessToken(): Promise<void> {
   try {
     await instance.post("/reissue");
-  } catch {
+  } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      console.warn("로그인 정보가 유효하지 않습니다.");
+
+      try {
+        await logoutUser();
+      } catch (logoutError) {
+        console.warn("logout 처리 중 에러 발생:", logoutError);
+      }
+    }
+
     throw new Error("토큰 재발급 실패");
   }
 }
@@ -59,9 +71,16 @@ instance.interceptors.response.use(
         refreshTokenRequest = null;
         // 재요청
         return instance(originalRequest);
-      } catch {
+      } catch (e) {
         refreshTokenRequest = null;
-        window.location.href = "/login?reason=session-expired";
+        if (e instanceof Error && e.message === "expired-refresh-token") {
+          try {
+            await logoutUser();
+          } catch (logoutError) {
+            console.warn("logout 처리 중 에러:", logoutError);
+          }
+          window.location.href = "/login?reason=session-expired";
+        }
       }
     }
 
