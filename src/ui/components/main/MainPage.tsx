@@ -5,8 +5,13 @@ import { Carousel } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import ProductCard from '@/ui/components/common/ProductCard';
-import { fetchRecentProducts, fetchPopularProducts, ProductResponse } from '@/services/api/productApi';
+import {
+  fetchRecentProducts,
+  fetchPopularProducts,
+  ProductResponse,
+} from '@/services/api/productApi';
 import KakaoMap from '@/ui/components/map/KakaoMap';
+import { useLikeStore } from '@/stores/likeStore';
 
 const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL ?? '';
 const banners = Array.from({ length: 5 }, (_, i) => `${s3BaseUrl}advertisement_${i + 1}.png`);
@@ -15,35 +20,39 @@ export default function MainPage() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [recentProducts, setRecentProducts] = useState<ProductResponse[]>([]);
   const [popularProducts, setPopularProducts] = useState<ProductResponse[]>([]);
+  const setLiked = useLikeStore((state) => state.setLiked);
+  const setLikeCount = useLikeStore((state) => state.setLikeCount);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 300);
-    };
+    const handleScroll = () => setShowScrollTop(window.scrollY > 300);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
-    const loadRecentProducts = async () => {
+    const loadProductsAndSyncLikes = async () => {
       try {
-        const products = await fetchRecentProducts(0, 4);
-        setRecentProducts(products);
+        const [recent, popular] = await Promise.all([
+          fetchRecentProducts(0, 4),
+          fetchPopularProducts(0, 10),
+        ]);
+        setRecentProducts(recent);
+        setPopularProducts(popular);
+
+        [...recent, ...popular].forEach((p) => {
+          setLikeCount(p.id, p.likeCount);
+
+          if (p.likedByMe !== undefined) {
+            setLiked(p.id, p.likedByMe); 
+          }
+        });
       } catch (err) {
-        console.error('최근 상품 불러오기 실패:', err);
+        console.error('상품 불러오기 실패:', err);
       }
     };
-    const loadPopularProducts = async () => {
-      try {
-        const products = await fetchPopularProducts(0, 10);
-        setPopularProducts(products);
-      } catch (err) {
-        console.error('인기 상품 불러오기 실패:', err);
-      }
-    };
-    loadRecentProducts();
-    loadPopularProducts();
-  }, []);
+
+    loadProductsAndSyncLikes();
+  }, [setLiked, setLikeCount]);
 
   const scrollToTop = () => {
     document.getElementById('scrollable-container')?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -97,50 +106,19 @@ export default function MainPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {recentProducts.map((product) => (
-              <Link
-                href={`/products/${product.id}`}
+              <ProductCard
                 key={product.id}
-                className="block rounded-md shadow-sm overflow-hidden w-full"
-                style={{ background: 'var(--bg-white)' }}
-              >
-                <div className="flex flex-col h-full">
-                  <div className="w-full aspect-square overflow-hidden rounded-md">
-                    <Image
-                      src={
-                        !product.imageUrls?.[0] || product.imageUrls[0] === '없음'
-                          ? '/assets/product/no-image.png'
-                          : product.imageUrls[0]
-                      }
-                      alt={product.name}
-                      width={300}
-                      height={300}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="p-2 flex flex-col gap-1">
-                    <div className="text-sm font-bold truncate">{product.name}</div>
-                    <div className="text-sm font-semibold" style={{ color: 'var(--text-dark-gray)' }}>
-                      {product.free ? '무료나눔' : `${product.price.toLocaleString()}원`}
-                    </div>
-                    <div className="flex gap-1 flex-wrap">
-                      {(product.tags ?? []).slice(0, 2).map((tag, index) => (
-                        <span
-                          key={index}
-                          className="text-[10px] px-1 py-[2px] rounded-full border"
-                          style={{
-                            background: 'var(--bg-gray)',
-                            color: 'var(--text-dark-gray)',
-                            borderColor: 'var(--border-light-gray)',
-                          }}
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </Link>
+                variant="recent"
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  imageUrl: product.imageUrls?.[0] ?? '/assets/product/no-image.png',
+                  price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
+                  tags: product.tags ?? [],
+                  likedByMe: product.likedByMe,
+                  likeCount: product.likeCount,
+                }}
+              />
             ))}
           </div>
         </div>
@@ -173,16 +151,14 @@ export default function MainPage() {
                   <ProductCard
                     variant="popular"
                     rank={index + 1}
-                    likeCount={product.likeCount}
                     product={{
                       id: product.id,
                       name: product.name,
-                      imageUrl:
-                        !product.imageUrls?.[0] || product.imageUrls[0] === '없음'
-                          ? '/assets/product/no-image.png'
-                          : product.imageUrls[0],
+                      imageUrl: product.imageUrls?.[0] ?? '/assets/product/no-image.png',
                       price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
                       tags: product.tags ?? [],
+                      likedByMe: product.likedByMe,
+                      likeCount: product.likeCount,
                     }}
                   />
                 </div>
