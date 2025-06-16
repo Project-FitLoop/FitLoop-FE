@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ProductDetail } from "@/services/api/productApi";
+import { ProductDetail, fetchProductDetail } from "@/services/api/productApi";
 import { CloseOutlined } from "@ant-design/icons";
 import { addToCart } from '@/services/api/cartApi';
 import { message, Carousel, Modal } from "antd";
+import { likeProduct, unlikeProduct } from "@/services/api/likeApi";
 
 interface ProductDetailPageProps {
   product: ProductDetail;
@@ -31,7 +32,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
   const [showCarbonInfo, setShowCarbonInfo] = useState(false);
   const [showConditionGuide, setShowConditionGuide] = useState(false);
   const [showShippingInfo, setShowShippingInfo] = useState(false);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(product.likedByMe ?? false);
+  const [productData, setProductData] = useState<ProductDetail>(product); // 최신 데이터 반영
   const [fullscreenVisible, setFullscreenVisible] = useState(false);
   const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const router = useRouter();
@@ -39,7 +41,48 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
   const toggleCarbon = () => setShowCarbonInfo(!showCarbonInfo);
   const toggleCondition = () => setShowConditionGuide(!showConditionGuide);
   const toggleShippingInfo = () => setShowShippingInfo(!showShippingInfo);
-  const toggleLike = () => setLiked(!liked);
+  const toggleLike = async () => {
+    try {
+      console.log("토글 이전 상태 liked:", liked);
+
+      if (liked) {
+        console.log("좋아요 취소 요청");
+        await unlikeProduct(productData.id);
+        setLiked(false);
+      } else {
+        console.log("좋아요 추가 요청");
+        await likeProduct(productData.id);
+        setLiked(true);
+      }
+
+      // 최신 상태 가져오기
+      const updated = await fetchProductDetail(productData.id);
+      console.log("백엔드에서 받아온 likedByMe:", updated.likedByMe);
+
+      setProductData(updated);
+      setLiked(updated.likedByMe ?? false);
+      console.log("최종 반영된 liked 상태:", updated.likedByMe ?? false);
+    } catch (e) {
+      console.error("좋아요 처리 실패:", e);
+      message.error("좋아요 처리 실패");
+    }
+  };
+
+
+   useEffect(() => {
+    const fetchLatestProduct = async () => {
+      try {
+        const latest = await fetchProductDetail(product.id);
+        setProductData(latest);
+        setLiked(latest.likedByMe ?? false);
+      } catch (err) {
+        console.error("상세정보 가져오기 실패", err);
+      }
+    };
+
+    fetchLatestProduct();
+  }, [product.id]);
+
   const handleGoBack = () => router.back();
   const handleAddToCart = async () => {
     try {
