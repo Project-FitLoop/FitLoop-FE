@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Carousel } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,6 +12,7 @@ import {
 } from '@/services/api/productApi';
 import KakaoMap from '@/ui/components/map/KakaoMap';
 import { useLikeStore } from '@/stores/likeStore';
+import { useRouter } from 'next/navigation';
 
 const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL ?? '';
 const banners = Array.from({ length: 5 }, (_, i) => `${s3BaseUrl}advertisement_${i + 1}.png`);
@@ -22,6 +23,8 @@ export default function MainPage() {
   const [popularProducts, setPopularProducts] = useState<ProductResponse[]>([]);
   const setLiked = useLikeStore((state) => state.setLiked);
   const setLikeCount = useLikeStore((state) => state.setLikeCount);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
@@ -41,9 +44,8 @@ export default function MainPage() {
 
         [...recent, ...popular].forEach((p) => {
           setLikeCount(p.id, p.likeCount);
-
           if (p.likedByMe !== undefined) {
-            setLiked(p.id, p.likedByMe); 
+            setLiked(p.id, p.likedByMe);
           }
         });
       } catch (err) {
@@ -54,6 +56,78 @@ export default function MainPage() {
     loadProductsAndSyncLikes();
   }, [setLiked, setLikeCount]);
 
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    let isDragging = false;
+    let targetScrollLeft = 0;
+    let animationFrame: number;
+
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    const animate = () => {
+      slider.scrollLeft = lerp(slider.scrollLeft, targetScrollLeft, 0.2);
+      if (Math.abs(slider.scrollLeft - targetScrollLeft) > 0.5) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    const onMouseDown = (e: MouseEvent) => {
+      isDown = true;
+      isDragging = false;
+      startX = e.pageX;
+      scrollLeft = slider.scrollLeft;
+      cancelAnimationFrame(animationFrame);
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      const x = e.pageX;
+      const walk = x - startX;
+      if (Math.abs(walk) > 5) {
+        isDragging = true;
+        targetScrollLeft = scrollLeft - walk;
+        cancelAnimationFrame(animationFrame);
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    const onMouseUp = () => {
+      isDown = false;
+
+      if (isDragging) {
+        const preventClick = (e: MouseEvent) => {
+          e.stopPropagation();
+          e.preventDefault();
+          slider.removeEventListener('click', preventClick, true);
+        };
+        slider.addEventListener('click', preventClick, true);
+      }
+    };
+
+    slider.addEventListener('mousedown', onMouseDown);
+    slider.addEventListener('mousemove', onMouseMove);
+    slider.addEventListener('mouseup', onMouseUp);
+    slider.addEventListener('mouseleave', onMouseUp);
+
+    slider.querySelectorAll('*').forEach((el) => {
+      (el as HTMLElement).style.userSelect = 'none';
+      (el as HTMLElement).setAttribute('draggable', 'false');
+    });
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      slider.removeEventListener('mousedown', onMouseDown);
+      slider.removeEventListener('mousemove', onMouseMove);
+      slider.removeEventListener('mouseup', onMouseUp);
+      slider.removeEventListener('mouseleave', onMouseUp);
+    };
+  }, [popularProducts]);
+
   const scrollToTop = () => {
     document.getElementById('scrollable-container')?.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -62,14 +136,7 @@ export default function MainPage() {
     <div
       id="scrollable-container"
       className="scrollbar-hide px-4 pb-16"
-      style={{
-        height: '100vh',
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        scrollBehavior: 'smooth',
-        background: 'var(--bg-gray)',
-        color: 'var(--foreground)',
-      }}
+      style={{ height: '100vh', overflowY: 'auto', overflowX: 'hidden', scrollBehavior: 'smooth', background: 'var(--bg-gray)', color: 'var(--foreground)' }}
     >
       {/* 광고 배너 */}
       <div className="mt-4 max-h-[250px] overflow-hidden rounded-md" style={{ background: 'var(--bg-white)' }}>
@@ -95,13 +162,7 @@ export default function MainPage() {
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-base font-semibold">최근 등록된 상품</h2>
             <Link href="/product/recent">
-              <Image
-                src="/assets/common/left-arrow.svg"
-                alt="더보기"
-                width={16}
-                height={16}
-                className="rotate-180 mr-1"
-              />
+              <Image src="/assets/common/left-arrow.svg" alt="더보기" width={16} height={16} className="rotate-180 mr-1" />
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -130,40 +191,32 @@ export default function MainPage() {
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-base font-semibold">인기 상품</h2>
             <Link href="/product/popularity">
-              <Image
-                src="/assets/common/left-arrow.svg"
-                alt="더보기"
-                width={16}
-                height={16}
-                className="rotate-180 mr-1"
-              />
+              <Image src="/assets/common/left-arrow.svg" alt="더보기" width={16} height={16} className="rotate-180 mr-1" />
             </Link>
           </div>
-
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex space-x-3 w-max">
-              {popularProducts.map((product, index) => (
-                <div
-                  key={product.id}
-                  className="min-w-[160px] max-w-[160px] flex-shrink-0 shadow-sm"
-                  style={{ background: 'var(--bg-white)' }}
-                >
-                  <ProductCard
-                    variant="popular"
-                    rank={index + 1}
-                    product={{
-                      id: product.id,
-                      name: product.name,
-                      imageUrl: product.imageUrls?.[0] ?? '/assets/product/no-image.png',
-                      price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
-                      tags: product.tags ?? [],
-                      likedByMe: product.likedByMe,
-                      likeCount: product.likeCount,
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
+          <div ref={sliderRef} className="flex gap-4 overflow-x-scroll px-2 scrollbar-hide cursor-grab select-none" style={{ scrollBehavior: 'auto' }}>
+            {popularProducts.map((product, index) => (
+              <div
+                key={product.id}
+                className="min-w-[160px] max-w-[160px] flex-shrink-0 shadow-sm"
+                style={{ background: 'var(--bg-white)' }}
+                onClick={() => router.push(`/products/${product.id}`)}
+              >
+                <ProductCard
+                  variant="popular"
+                  rank={index + 1}
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    imageUrl: product.imageUrls?.[0] ?? '/assets/product/no-image.png',
+                    price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
+                    tags: product.tags ?? [],
+                    likedByMe: product.likedByMe,
+                    likeCount: product.likeCount,
+                  }}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -174,13 +227,7 @@ export default function MainPage() {
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-base font-semibold">오프라인 매장 위치</h2>
             <Link href="https://map.kakao.com/" target="_blank">
-              <Image
-                src="/assets/common/left-arrow.svg"
-                alt="더보기"
-                width={16}
-                height={16}
-                className="rotate-180 mr-1"
-              />
+              <Image src="/assets/common/left-arrow.svg" alt="더보기" width={16} height={16} className="rotate-180 mr-1" />
             </Link>
           </div>
           <KakaoMap />
