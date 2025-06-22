@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useCallback } from 'react';
 import Link from 'next/link';
@@ -47,104 +47,92 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="flex justify-center bg-gray-50 h-auto min-h-screen px-4">
+    <div className="flex justify-center items-start bg-white h-screen px-4 pt-28">
       <div className="w-full max-w-sm">
         {/* 로고 */}
-        <div className="flex justify-center mb-2">
-          <Image
-            src="/assets/loginform/login_logo.svg"
-            alt="Login Logo"
-            width={120}
-            height={40}
-            priority
-          />
-        </div>
-
-        {/* 헤더 */}
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">FITLOOP</h1>
-          <p className="text-sm text-gray-500 mt-1">자연을 입다, 감성을 나누다</p>
+        <div className="flex justify-center mb-4">
+          <Image src="/assets/loginform/login_logo.svg" alt="Fitloop Logo" width={100} height={40} priority />
         </div>
 
         {/* 로그인 카드 */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-6 space-y-6">
-          <div className="text-center">
-            <Title level={3} className="!text-xl !mb-2 font-bold text-gray-800">로그인</Title>
-            <Text className="text-sm text-gray-600">
+        <div className="bg-white rounded-xl shadow-xl px-6 py-8">
+          {/* 헤더 */}
+          <div className="text-center mb-6">
+            <Title level={3} className="!text-2xl !mb-2 font-bold text-gray-900">
+              계정에 로그인
+            </Title>
+            <Text className="text-sm text-gray-500">
               아직 회원이 아니신가요?{' '}
-              <Link href="/register" className="text-blue-600 font-semibold hover:underline">
-                회원가입
+              <Link href="/register" className="text-indigo-600 font-medium hover:underline">
+                회원가입 하기
               </Link>
             </Text>
           </div>
 
-          {/* 로그인 폼 */}
           <Form
             name="login"
             initialValues={{ remember: true }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             layout="vertical"
-            className="space-y-4"
           >
             <Form.Item
-              label="아이디"
+              label={<span className="text-sm text-gray-700 font-medium">이메일 주소</span>}
               name="username"
-              rules={[{ required: true, message: '아이디를 입력해주세요.' }]}
+              rules={[{ required: true, message: '이메일을 입력해주세요.' }]}
             >
               <Input
-                placeholder="아이디를 입력해주세요"
                 size="large"
-                className="rounded-lg h-11 bg-white border border-gray-300 px-4 placeholder-gray-400"
+                className="rounded-md h-11 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                placeholder="you@example.com"
               />
             </Form.Item>
 
             <Form.Item
-              label="비밀번호"
+              label={<span className="text-sm text-gray-700 font-medium">비밀번호</span>}
               name="password"
               rules={[{ required: true, message: '비밀번호를 입력해주세요.' }]}
             >
               <Input.Password
-                placeholder="비밀번호를 입력해주세요"
                 size="large"
-                className="rounded-lg h-11 bg-white border border-gray-300 px-4 placeholder-gray-400"
+                className="rounded-md h-11 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                placeholder="••••••••"
               />
             </Form.Item>
 
-            <Form.Item name="remember" valuePropName="checked" className="!mb-1">
-              <div className="flex justify-between items-center text-gray-600">
-                <Checkbox className="text-gray-700">자동 로그인</Checkbox>
-                <Link href="/forgot-password" className="text-sm text-gray-500 hover:underline">
+            <Form.Item className="!mb-2">
+              <div className="flex justify-between items-center">
+                <Checkbox className="text-gray-600">로그인 상태 유지</Checkbox>
+                <Link href="/forgot-password" className="text-sm text-indigo-600 hover:underline">
                   비밀번호 찾기
                 </Link>
               </div>
             </Form.Item>
 
-            <Form.Item className="!mt-4 !mb-2">
+            <Form.Item className="!mb-4">
               <Button
                 type="primary"
                 htmlType="submit"
                 block
                 size="large"
-                className="bg-black hover:bg-gray-800 border-none text-white rounded-lg h-12 font-medium transition"
+                className="bg-indigo-600 hover:bg-indigo-700 border-none rounded-md h-11 font-semibold"
               >
                 로그인
               </Button>
             </Form.Item>
           </Form>
 
-          <Divider className="border-gray-300" />
+          <Divider plain className="text-sm text-gray-500">또는 소셜 계정으로 로그인</Divider>
 
-          {/* Google 로그인 */}
-          <Button
-            size="large"
-            block
-            onClick={handleGoogleLogin}
-            className="bg-white hover:bg-gray-50 border border-gray-300 rounded-lg h-12 flex items-center justify-center gap-2 text-gray-700 font-medium"
-          >
-            <Image src="/assets/google.svg" alt="Google" width={20} height={20} />
-            Google로 로그인
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              block
+              onClick={handleGoogleLogin}
+              className="flex-1 bg-white border border-gray-300 rounded-md h-11 flex items-center justify-center gap-2 text-gray-700 font-medium hover:bg-gray-50"
+            >
+              <Image src="/assets/google.svg" alt="Google" width={20} height={20} /> Google 로그인
+            </Button>
+          </div>
         </div>
       </div>
     </div>
