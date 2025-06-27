@@ -39,7 +39,7 @@ let refreshTokenRequest: Promise<void> | null = null;
 async function reissueAccessToken(): Promise<void> {
   try {
     await instance.post("/reissue");
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       console.warn("로그인 정보가 유효하지 않습니다.");
 

@@ -4,11 +4,8 @@ interface LikeStore {
   likedProductIds: Set<number>;
   likeCountMap: Map<number, number>;
 
-  // 초기 데이터 세팅
   setLiked: (productId: number, liked: boolean) => void;
   setLikeCount: (productId: number, count: number) => void;
-
-  // 좋아요 버튼 클릭용 (count 조작 포함)
   toggleLike: (productId: number, liked: boolean) => void;
 
   isLiked: (productId: number) => boolean;
@@ -22,7 +19,11 @@ export const useLikeStore = create<LikeStore>((set, get) => ({
   setLiked: (productId, liked) =>
     set((state) => {
       const likedSet = new Set(state.likedProductIds);
-      liked ? likedSet.add(productId) : likedSet.delete(productId);
+      if (liked) {
+        likedSet.add(productId);
+      } else {
+        likedSet.delete(productId);
+      }
       return { likedProductIds: likedSet };
     }),
 
@@ -36,7 +37,11 @@ export const useLikeStore = create<LikeStore>((set, get) => ({
   toggleLike: (productId, liked) =>
     set((state) => {
       const likedSet = new Set(state.likedProductIds);
-      liked ? likedSet.add(productId) : likedSet.delete(productId);
+      if (liked) {
+        likedSet.add(productId);
+      } else {
+        likedSet.delete(productId);
+      }
 
       const map = new Map(state.likeCountMap);
       const prevCount = map.get(productId) ?? 0;

@@ -69,7 +69,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product }) => {
   };
 
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchLatestProduct = async () => {
       try {
         const latest = await fetchProductDetail(product.id);

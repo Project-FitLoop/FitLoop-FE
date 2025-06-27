@@ -71,13 +71,15 @@ const CategoryPage: React.FC = () => {
             <div key={product.id} ref={isLast ? lastProductRef : null}>
               <ProductCard
                 variant="category"
-                likeCount={product.likeCount}
+                rank={index + 1}
                 product={{
                   id: product.id,
                   name: product.name,
-                  imageUrl: product.imageUrls?.[0] ?? '/assets/default.png',
-                  tags: product.tags ?? [],
+                  imageUrl: product.imageUrls?.[0] ?? '/assets/product/no-image.png',
                   price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
+                  tags: product.tags ?? [],
+                  likedByMe: product.likedByMe,
+                  likeCount: product.likeCount,
                 }}
               />
             </div>
