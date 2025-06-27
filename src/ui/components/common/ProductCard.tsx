@@ -19,7 +19,7 @@ interface Product {
   likeCount?: number;
 }
 
-type ProductCardVariant = "popular" | "recent" | "category";
+type ProductCardVariant = "popular" | "recent" | "category" | 'search';
 
 interface ProductCardProps {
   product: Product;
