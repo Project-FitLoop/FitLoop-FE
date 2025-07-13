@@ -56,13 +56,16 @@ const PopularityPage: React.FC = () => {
               <ProductCard
                 variant="popular"
                 rank={index + 1}
-                likeCount={product.likeCount}
                 product={{
                   id: product.id,
                   name: product.name,
-                  imageUrl: product.imageUrls?.[0] ?? '/assets/default.png',
+                  imageUrl: product.imageUrls?.[0] ?? '/assets/product/no-image.png',
+                  price: product.free
+                    ? '무료나눔'
+                    : `${product.price.toLocaleString()}원`,
                   tags: product.tags ?? [],
-                  price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
+                  likedByMe: product.likedByMe,
+                  likeCount: product.likeCount,
                 }}
               />
             </div>
@@ -71,7 +74,10 @@ const PopularityPage: React.FC = () => {
       </div>
       {loading && <p className="text-center mt-4">로딩 중...</p>}
       {!hasMore && (
-        <p className="text-center mt-4" style={{color: "var(--text-dark-gray)"}}>
+        <p
+          className="text-center mt-4"
+          style={{ color: 'var(--text-dark-gray)' }}
+        >
           모든 상품을 불러왔습니다.
         </p>
       )}

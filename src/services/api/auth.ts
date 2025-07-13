@@ -86,8 +86,11 @@ const getCookie = (name: string): string | null => {
 export const logoutUser = async (): Promise<void> => {
   try {
     const accessToken = getCookie("access");
-    if (!accessToken) {
-      throw new Error("Access Token이 쿠키에 없습니다.");
+
+    // access 없어도 그냥 요청
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers["access"] = accessToken;
     }
 
     const response = await axios.post(
@@ -95,25 +98,22 @@ export const logoutUser = async (): Promise<void> => {
       {},
       {
         withCredentials: true,
-        headers: {
-          access: accessToken,
-        },
+        headers,
       }
     );
 
     if (response.status === 200) {
-      console.log("로그아웃 성공!");
-      document.cookie = "access=; path=/; max-age=0;";
+      console.log("로그아웃 성공");
     } else {
-      throw new Error("로그아웃 요청 실패");
+      console.warn("로그아웃 요청은 했지만 성공 응답이 아님:", response.status);
     }
+    document.cookie = "access=; path=/; max-age=0;";
   } catch (error: unknown) {
+    document.cookie = "access=; path=/; max-age=0;";
     if (axios.isAxiosError(error)) {
-      console.error("로그아웃 실패:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || "로그아웃 요청 실패");
+      console.error("로그아웃 요청 실패:", error.response?.data || error.message);
     } else {
-      console.error("로그아웃 실패: 알 수 없는 오류", error);
-      throw new Error("알 수 없는 오류가 발생했습니다.");
+      console.error("로그아웃 중 알 수 없는 오류:", error);
     }
   }
 };
