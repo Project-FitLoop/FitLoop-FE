@@ -97,8 +97,8 @@ export default function SearchResult() {
             <Image
               src="/assets/common/no-result.png"
               alt="검색 결과 없음"
-              width={100}
-              height={100}
+              width={200}
+              height={200}
               className="mb-4"
             />
             <p className="text-sm font-medium">검색 결과가 없습니다</p>
