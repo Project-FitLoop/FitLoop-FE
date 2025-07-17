@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { BANK_LIST } from "@/data/bankList";
 import { useRouter } from "next/navigation";
 import { LeftOutlined, DownOutlined } from "@ant-design/icons";
+import { saveAccountSetting } from "@/services/api/setting";
 
 export default function AccountNumberForm() {
   const router = useRouter();
@@ -20,6 +21,10 @@ export default function AccountNumberForm() {
   const [optional, setOptional] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const [showDetail1, setShowDetail1] = useState(false);
+  const [showDetail2, setShowDetail2] = useState(false);
+  const [showDetailOptional, setShowDetailOptional] = useState(false);
 
   // 숫자만 입력
   const handleAccountNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,21 +51,34 @@ export default function AccountNumberForm() {
     setOptional(newValue);
   };
 
-  // 약관 동의 완료
-  const handleConsentComplete = () => {
+  // 약관 동의 완료 (API 호출)
+  const handleConsentComplete = async () => {
     if (!required1 || !required2) {
       alert("필수 항목을 모두 동의해주세요.");
       return;
     }
-    setShowConsentModal(false);
-    setShowCompleteModal(true);
-    document.body.style.overflow = "auto";
+
+    try {
+      await saveAccountSetting({
+        bankName: selectedBank!.name,
+        accountNumber,
+        depositor: owner,
+      });
+
+      setShowConsentModal(false);
+      setShowCompleteModal(true);
+      document.body.style.overflow = "auto";
+    } catch (error) {
+      console.error(error);
+      alert("계좌정보 저장 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   // 등록 완료 확인
   const handleConfirmComplete = () => {
     setShowCompleteModal(false);
     setSaved(true);
+    router.back();
   };
 
   useEffect(() => {
@@ -168,8 +186,8 @@ export default function AccountNumberForm() {
             </div>
           </div>
           <button
-            disabled
-            className="w-full py-4 rounded-full text-[var(--text-white)] text-base bg-[var(--bg-dark-gray)] cursor-not-allowed"
+            onClick={handleSaveClick}
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[90%] max-w-[393px] py-4 rounded-full text-[var(--text-white)] text-base bg-[var(--bg-black)] hover:bg-[var(--bg-dark-gray)] transition"
           >
             저장하기
           </button>
@@ -178,9 +196,8 @@ export default function AccountNumberForm() {
 
       {/* 약관 동의 모달 */}
       {showConsentModal && (
-        <div className="fixed inset-0 z-50 bg-[rgba(0,0,0,0.95)] flex items-end justify-center">
-          <div className="mb-12 w-full max-w-md rounded-t-3xl bg-[var(--bg-white)] p-6 border-t border-[var(--border-light-gray)] max-h-[80vh] overflow-y-auto">
-            {/* 상단 헤더 */}
+        <div className="fixed inset-0 z-50 bg-[rgba(0,0,0,0.55)] flex items-end justify-center">
+          <div className="mb-12 w-full max-w-[393px] rounded-t-3xl bg-[var(--bg-white)] p-6 border-t border-[var(--border-light-gray)] max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold flex-1 text-center">약관 동의</h2>
               <button
@@ -207,32 +224,79 @@ export default function AccountNumberForm() {
               </div>
 
               <div className="space-y-2 text-sm">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={required1}
-                    onChange={() => setRequired1(!required1)}
-                    className="mr-2"
-                  />
-                  (필수) 가품, 보세 상품판매를 금지합니다.
+                <div className="flex flex-col">
+                  <div className="flex justify-between items-center">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={required1}
+                        onChange={() => setRequired1(!required1)}
+                        className="mr-2"
+                      />
+                      (필수) 계좌정보 수집 및 이용 동의
+                    </label>
+                    <button
+                      onClick={() => setShowDetail1(!showDetail1)}
+                      className="text-xs text-blue-500 ml-2"
+                    >
+                      {showDetail1 ? "닫기" : "자세히 보기"}
+                    </button>
+                  </div>
+                  {showDetail1 && (
+                    <p className="mt-1 ml-6 text-[var(--text-gray)] text-xs">
+                      등록한 계좌정보는 출금계좌 등록 및 본인확인 목적으로 사용되며, 관련 법령에 따라 보관됩니다.
+                    </p>
+                  )}
                 </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={required2}
-                    onChange={() => setRequired2(!required2)}
-                    className="mr-2"
-                  />
-                  (필수) 목적과 맞지 않는 게시물을 금지합니다.
+
+                <div className="flex flex-col">
+                  <div className="flex justify-between items-center">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={required2}
+                        onChange={() => setRequired2(!required2)}
+                        className="mr-2"
+                      />
+                      (필수) 제3자 제공 동의
+                    </label>
+                    <button
+                      onClick={() => setShowDetail2(!showDetail2)}
+                      className="text-xs text-blue-500 ml-2"
+                    >
+                      {showDetail2 ? "닫기" : "자세히 보기"}
+                    </button>
+                  </div>
+                  {showDetail2 && (
+                    <p className="mt-1 ml-6 text-[var(--text-gray)] text-xs">
+                        본인 확인을 위해 해당 계좌정보를 금융기관 등 제3자에게 제공할 수 있음에 동의합니다.
+                    </p>
+                  )}
                 </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={optional}
-                    onChange={() => setOptional(!optional)}
-                    className="mr-2"
-                  />
-                  (선택) 마케팅 정보 수신 동의합니다.
+
+                <div className="flex flex-col">
+                  <div className="flex justify-between items-center">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={optional}
+                        onChange={() => setOptional(!optional)}
+                        className="mr-2"
+                      />
+                      (선택) 마케팅 정보 수신 동의합니다.
+                    </label>
+                    <button
+                      onClick={() => setShowDetailOptional(!showDetailOptional)}
+                      className="text-xs text-blue-500 ml-2"
+                    >
+                      {showDetailOptional ? "닫기" : "자세히 보기"}
+                    </button>
+                  </div>
+                  {showDetailOptional && (
+                    <p className="mt-1 ml-6 text-[var(--text-gray)] text-xs">
+                      이메일, 문자 등을 통한 이벤트 및 프로모션 정보를 받아볼 수 있습니다.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -259,8 +323,7 @@ export default function AccountNumberForm() {
             <p className="mb-6 text-[16px]">계좌번호가 등록되었습니다.</p>
             <button
               onClick={handleConfirmComplete}
-              className="text-blue-600 font-semibold text-[16px]"
-            >
+              className="text-blue-600 font-semibold text-[16px]">
               OK
             </button>
           </div>
