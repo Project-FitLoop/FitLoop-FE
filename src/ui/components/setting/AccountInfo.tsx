@@ -2,9 +2,26 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { fetchProfile, fetchAccount } from "@/services/api/settingApi"; 
 
 const AccountInfo: React.FC = () => {
   const router = useRouter();
+
+  const handleClick = async (label: string, href: string) => {
+    try {
+      if (label === "개인정보") {
+        await fetchProfile(); 
+      } else if (label === "계정정보") {
+        await fetchAccount(); 
+      }
+
+      // 호출 성공 시 이동
+      router.push(href);
+    } catch (err) {
+      console.error(`${label} 요청 실패`, err);
+      alert(`${label} 정보를 불러오는 데 실패했습니다.`);
+    }
+  };
 
   const items = [
     { label: "개인정보", href: "/settings/account/personal" },
@@ -30,7 +47,7 @@ const AccountInfo: React.FC = () => {
           <div
             key={index}
             className="flex justify-between items-center py-4 text-[16px] text-[var(--text-black)] border-b border-[var(--border-light-gray)] cursor-pointer"
-            onClick={() => router.push(item.href)}
+            onClick={() => handleClick(item.label, item.href)}
           >
             <span className="font-medium">{item.label}</span>
             <RightOutlined className="text-[16px] text-[var(--icon-gray)]" />
