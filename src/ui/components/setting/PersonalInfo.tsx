@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import Link from "next/link";
+import { fetchProfile } from "@/services/api/settingApi";
 
 declare global {
   interface Window {
@@ -14,18 +15,41 @@ declare global {
 const PersonalInfo: React.FC = () => {
   const router = useRouter();
 
-  // 주소검색 상태
   const [postalCode, setPostalCode] = useState("");
   const [address, setAddress] = useState("");
   const [detailAddress, setDetailAddress] = useState("");
   const [isDaumLoaded, setIsDaumLoaded] = useState(false);
 
-  // 연락처 상태
   const [phone1, setPhone1] = useState("");
   const [phone2, setPhone2] = useState("");
 
-  // 생년월일
-  const [birthdate, setBirthdate] = useState("2000-01-31");
+  const [birthdate, setBirthdate] = useState("");
+  const [email, setEmail] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+
+  const [showVerification, setShowVerification] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const data = await fetchProfile();
+
+        setPhone1(formatPhoneNumber(data.phoneNumber || ""));
+        setEmail(data.email || "");
+        setAccountNumber(data.accountNumber || "");
+        setBirthdate(data.birthday || "");
+        setAddress(data.address || "");
+        setPostalCode(data.postalCode || "");
+        setDetailAddress(data.detailAccountNumber || "");
+      } catch (err) {
+        console.error("개인정보 불러오기 실패", err);
+        alert("개인정보를 불러오는 데 실패했습니다.");
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -65,7 +89,6 @@ const PersonalInfo: React.FC = () => {
     });
   };
 
-  /* 전화번호 자동 하이픈  */
   const formatPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, "");
 
@@ -137,17 +160,43 @@ const PersonalInfo: React.FC = () => {
           <div className="flex gap-2">
             <input
               type="email"
-              placeholder="fitloop@gmail.com"
-              onClick={() => alert("구현 예정")}
+              value={email}
+              readOnly={email !== ""}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일을 입력하세요"
               className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-[14px] text-black bg-white focus:outline-none"
             />
             <button
-              onClick={() => alert("구현 예정")}
-              className="border border-gray-300 rounded-md px-3 py-2 text-[14px] text-black bg-white"
+              disabled={email !== ""}
+              onClick={() => setShowVerification(true)}
+              className={`border rounded-md px-3 py-2 text-[14px] ${
+                email !== ""
+                  ? "text-gray-400 border-gray-200 bg-gray-100 cursor-not-allowed"
+                  : "text-black border-gray-300 bg-white"
+              }`}
             >
               인증하기
             </button>
           </div>
+
+          {/* 인증번호 입력 창 */}
+          {showVerification && email === "" && (
+            <div className="flex gap-2 pt-2">
+              <input
+                type="text"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                placeholder="인증번호 입력"
+                className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-[14px] text-black bg-white focus:outline-none"
+              />
+              <button
+                onClick={() => alert("인증 확인 로직 구현 예정")}
+                className="border border-gray-300 rounded-md px-3 py-2 text-[14px] text-black bg-white"
+              >
+                확인
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 계좌번호 */}
@@ -159,14 +208,14 @@ const PersonalInfo: React.FC = () => {
             href="/settings/account/account-number"
             className="flex justify-between items-center border border-gray-300 rounded-md px-3 py-2 cursor-pointer"
           >
-            <span className="text-[14px] text-black">내 계좌번호</span>
+            <span className="text-[14px] text-black">{accountNumber || "내 계좌번호"}</span>
             <RightOutlined className="text-[16px] text-gray-400" />
           </Link>
         </div>
 
         {/* 생년월일 */}
         <div className="flex flex-col space-y-2">
-          <label className="text-[14px] text-black">생년월일 <span className="text-red-500">*</span> </label>
+          <label className="text-[14px] text-black">생년월일 <span className="text-red-500">*</span></label>
           <input
             type="date"
             value={birthdate}
@@ -177,23 +226,20 @@ const PersonalInfo: React.FC = () => {
 
         {/* 배송지 */}
         <div className="flex flex-col space-y-2">
-          <label className="text-[14px] text-black">배송지 <span className="text-red-500">*</span> </label>
-
-          {/* 주소 input + 버튼 가로 배치 */}
+          <label className="text-[14px] text-black">배송지 <span className="text-red-500">*</span></label>
           <div className="flex gap-2">
             <input
               readOnly
-              value={address}
-              placeholder="주소를 선택하세요"
+              value={postalCode}
+              placeholder="우편번호 입력"
               className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-[14px] text-black bg-white focus:outline-none"
             />
             <button
               onClick={handlePostcodeSearch}
               disabled={!isDaumLoaded}
-              className={`border rounded-md px-3 py-2 text-[14px] ${
-                isDaumLoaded
-                  ? "text-black border-gray-300 bg-white"
-                  : "text-gray-400 border-gray-200 bg-gray-50 cursor-not-allowed"
+              className={`border rounded-md px-3 py-2 text-[14px] ${isDaumLoaded
+                ? "text-black border-gray-300 bg-white"
+                : "text-gray-400 border-gray-200 bg-gray-50 cursor-not-allowed"
               }`}
             >
               {isDaumLoaded ? "주소 검색" : "로딩 중..."}
@@ -202,14 +248,13 @@ const PersonalInfo: React.FC = () => {
 
           <input
             readOnly
-            value={postalCode}
-            placeholder="우편번호"
+            value={address}
+            placeholder="주소 입력"
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-[14px] text-black bg-white focus:outline-none"
           />
           <input
-            type="text"
+            readOnly
             value={detailAddress}
-            onChange={(e) => setDetailAddress(e.target.value)}
             placeholder="상세 주소 입력"
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-[14px] text-black bg-white focus:outline-none"
           />
