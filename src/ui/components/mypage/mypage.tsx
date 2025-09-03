@@ -8,6 +8,7 @@ import BackButton from "@/ui/components/common/BackButton";
 import { fetchRecentViewedProducts } from "@/services/api/recentViewedApi";
 import ProductCard from "@/ui/components/common/ProductCard";
 import { ProductResponse } from "@/services/api/productApi";
+import Link from "next/link";
 
 const { Title, Text } = Typography;
 
@@ -132,7 +133,11 @@ const MyPage: React.FC = () => {
               <Text className="text-[var(--text-gray)] text-xs">마일리지 1.5% 적립 & 쿠폰팩</Text>
             </div>
           </div>
-          <Button className="bg-white text-black border border-gray-300 hover:bg-gray-100 transition" size="small">혜택 보기</Button>
+          <Link href="/mypage/benefits">
+            <Button className="bg-white text-black border border-gray-300 hover:bg-gray-100 transition" size="small">
+              혜택 보기
+            </Button>
+          </Link>        
         </Card>
         <Card className="mt-4">
           <Space size="large" wrap={false}>
