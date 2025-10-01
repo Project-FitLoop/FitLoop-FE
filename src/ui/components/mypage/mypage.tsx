@@ -6,6 +6,7 @@ import { Card, Typography, Button, List, Space, Image, Carousel } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 import BackButton from "@/ui/components/common/BackButton";
 import { fetchRecentViewedProducts } from "@/services/api/recentViewedApi";
+import { fetchWalletBalance } from "@/services/api/walletApi";
 import ProductCard from "@/ui/components/common/ProductCard";
 import { ProductResponse } from "@/services/api/productApi";
 import Link from "next/link";
@@ -15,6 +16,7 @@ const { Title, Text } = Typography;
 const MyPage: React.FC = () => {
   const router = useRouter();
   const [recentViewed, setRecentViewed] = useState<ProductResponse[]>([]);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -27,6 +29,18 @@ const MyPage: React.FC = () => {
       }
     };
     loadRecentViewed();
+  }, []);
+
+  useEffect(() => {
+    const loadWallet = async () => {
+      try {
+        const balance = await fetchWalletBalance();
+        setWalletBalance(balance);
+      } catch (err) {
+        console.error("FitPay 잔액 불러오기 실패:", err);
+      }
+    };
+    loadWallet();
   }, []);
 
   useEffect(() => {
@@ -124,6 +138,49 @@ const MyPage: React.FC = () => {
         <div className="mt-4">
           <Text strong className="text-[var(--text-black)]">빵순이님, 안녕하세요 :)</Text>
         </div>
+
+        <Card
+          className="mt-4 w-full rounded-xl shadow-md bg-white border border-gray-100"
+          styles={{ body: { padding: "20px" } }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Image 
+                src="/assets/fitpay.svg" 
+                alt="FitPay" 
+                width={160}
+                height={60}
+                preview={false} 
+              />
+            </div>
+            <div className="flex items-center gap-2 cursor-pointer">
+              <span className="text-2xl font-bold text-black tracking-wide">
+                {walletBalance.toLocaleString()}원
+              </span>
+              <div className="text-gray-400 text-lg font-bold">›</div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 mt-6">
+            <Button
+              block
+              className="bg-[#FEE500] text-black font-semibold rounded-xl py-4 hover:opacity-90 transition"
+              size="middle"
+              onClick={() => router.push("/wallet/charge")}
+            >
+              충전하기
+            </Button>
+            <Button
+              block
+              className="bg-white text-black font-semibold rounded-xl py-4 shadow-sm border border-gray-200 hover:shadow-md transition"
+              size="middle"
+              onClick={() => router.push("/wallet/transfer")}
+            >
+              계좌 송금
+            </Button>
+          </div>
+        </Card>
+
         <Card className="mt-4 bg-[var(--bg-light-gray)] rounded-xl" styles={{ body: { display: "flex", alignItems: "center", justifyContent: "space-between" } }}>
           <div className="flex items-center">
             <Image src="/assets/sprout.png" alt="새싹" width={40} preview={false} />
@@ -137,8 +194,9 @@ const MyPage: React.FC = () => {
             <Button className="bg-white text-black border border-gray-300 hover:bg-gray-100 transition" size="small">
               혜택 보기
             </Button>
-          </Link>        
+          </Link>
         </Card>
+
         <Card className="mt-4">
           <Space size="large" wrap={false}>
             {["구매내역", "판매내역", "리뷰", "쿠폰", "포인트"].map((label, index) => (
