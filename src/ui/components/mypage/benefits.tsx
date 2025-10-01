@@ -3,6 +3,7 @@
 import { Card, Typography, Progress, Tag, List, Space, Divider, Button, Image, Tooltip } from "antd";
 import { ArrowLeftOutlined, QuestionCircleOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import Link from "next/link";
+import BackButton from "@/ui/components/common/BackButton";
 
 const { Title, Text } = Typography;
 
@@ -39,9 +40,7 @@ export default function BenefitPageClient({ data }: Props) {
     <div className="max-w-[480px] mx-auto bg-[var(--bg-gray,#f7f7f8)] min-h-screen pb-[80px]">
       {/* 헤더 */}
       <div className="sticky top-0 z-10 bg-white border-b px-4 py-3 flex items-center gap-3">
-        <Link href="/mypage" className="inline-flex">
-          <Button size="small" shape="circle" icon={<ArrowLeftOutlined />} />
-        </Link>
+        <BackButton className="text-lg cursor-pointer" />
         <Title level={4} className="m-0">등급 혜택</Title>
         <div className="ml-auto">
           <Tooltip title="등급 산정은 최근 3개월 누적 결제 기준입니다.">
