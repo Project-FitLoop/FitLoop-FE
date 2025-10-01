@@ -29,7 +29,13 @@ const BackButton: React.FC<BackButtonProps> = ({
       onClick={handleBack}
       className={`flex items-center text-lg font-bold ${className}`}
     >
-      <Image src={imageSrc} alt="뒤로 가기" width={20} height={20} className="mr-2" />
+      <Image
+        src={imageSrc}
+        alt="뒤로 가기"
+        width={20}
+        height={20}
+        className="mr-2 relative -translate-y-[3px]"
+      />
     </button>
   );
 };
