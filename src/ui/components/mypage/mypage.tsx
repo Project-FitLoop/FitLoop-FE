@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Typography, Button, List, Space, Image, Carousel } from "antd";
-import { SettingOutlined } from "@ant-design/icons";
+import { SettingOutlined, SwapOutlined, WalletOutlined } from "@ant-design/icons";
 import BackButton from "@/ui/components/common/BackButton";
 import { fetchRecentViewedProducts } from "@/services/api/recentViewedApi";
 import { fetchWalletBalance } from "@/services/api/walletApi";
@@ -145,36 +145,65 @@ const MyPage: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Image 
-                src="/assets/fitpay.svg" 
-                alt="FitPay" 
+              <Image
+                src="/assets/fitpay.svg"
+                alt="FitPay"
                 width={160}
                 height={60}
-                preview={false} 
+                preview={false}
+                className="opacity-95"
               />
             </div>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <span className="text-2xl font-bold text-black tracking-wide">
-                {walletBalance.toLocaleString()}원
-              </span>
-              <div className="text-gray-400 text-lg font-bold">›</div>
-            </div>
+
+            <button
+              aria-label="잔액 상세"
+              onClick={() => router.push("/wallet")}
+              className="flex flex-col items-end group text-right"
+            >
+              <span className="text-sm text-gray-500 mb-1">보유 잔액</span>
+              <div className="flex items-center gap-1">
+                <span className="text-3xl font-extrabold text-gray-900 tracking-tight group-hover:text-[#3B475C] transition-colors">
+                  {walletBalance.toLocaleString()}<span className="text-2xl font-semibold ml-0.5">원</span>
+                </span>
+                <span className="text-gray-400 text-lg font-bold group-hover:translate-x-0.5 transition-transform">›</span>
+              </div>
+              <span className="text-xs text-gray-400 mt-1">터치하여 상세보기</span>
+            </button>
           </div>
 
-          <div className="flex gap-3 mt-6">
+          <div className="grid grid-cols-2 gap-10 mt-6">
             <Button
               block
-              className="bg-[#FEE500] text-black font-semibold rounded-xl py-4 hover:opacity-90 transition"
-              size="middle"
-              onClick={() => router.push("/wallet/charge")}
+              size="large"
+              icon={<WalletOutlined />}
+              className="
+                h-12
+                text-white font-semibold
+                rounded-[12px]
+                bg-[#3B475C] hover:!bg-[#2F3C52] active:!bg-[#2A354B]
+                focus:!ring-2 focus:!ring-offset-2 focus:!ring-[#3B475C]
+                border-0 transition
+              "
+              onClick={() => router.push('/wallet/charge')}
             >
               충전하기
             </Button>
+
             <Button
               block
-              className="bg-white text-black font-semibold rounded-xl py-4 shadow-sm border border-gray-200 hover:shadow-md transition"
-              size="middle"
-              onClick={() => router.push("/wallet/transfer")}
+              size="large"
+              icon={<SwapOutlined />}
+              className="
+                h-12
+                bg-white text-black font-semibold
+                rounded-[12px]
+                border border-[#E5E7EB]
+                hover:!border-[#D1D5DB] hover:!bg-[#FAFAFA]
+                active:!bg-[#F5F5F5]
+                focus:!ring-2 focus:!ring-offset-2 focus:!ring-[#E5E7EB]
+                shadow-sm transition
+              "
+              onClick={() => router.push('/wallet/transfer')}
             >
               계좌 송금
             </Button>
