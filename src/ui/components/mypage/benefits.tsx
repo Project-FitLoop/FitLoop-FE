@@ -51,7 +51,10 @@ export default function BenefitPageClient({ data }: Props) {
 
       <div className="p-4">
         {/* 현재 등급 카드 */}
-        <Card style={{ borderRadius: 16, borderColor: current.color }} bodyStyle={{ padding: 16 }}>
+        <Card
+          style={{ borderRadius: 16, borderColor: current.color }}
+          styles={{ body: { padding: 16 } }}
+        >
           <Space direction="vertical" size="small" className="w-full">
             <Space className="w-full items-center justify-between">
               <Space size="small" align="center">
