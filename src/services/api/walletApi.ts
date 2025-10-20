@@ -1,10 +1,5 @@
 import { instance } from "@/config/apiConfig";
 
-const getAccessTokenFromCookie = (): string | null => {
-  const match = document.cookie.match(/(?:^|; )access=([^;]*)/);
-  return match ? match[1] : null;
-};
-
 export const fetchWalletBalance = async (): Promise<number> => {
   try {
     const response = await instance.get<{ balance: number }>("/wallets/balance");
