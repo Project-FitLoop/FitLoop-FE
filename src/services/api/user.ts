@@ -48,3 +48,22 @@ export const registerInfomation = async (
     return false; 
   }
 };
+
+export const deleteAccount = async (): Promise<void> => {
+  const accessToken = getAccessTokenFromCookie();
+
+  if (!accessToken) {
+    throw new Error("Access Token이 없습니다. 로그인 후 다시 시도해주세요.");
+  }
+
+  try {
+    await instance.delete("/users", {
+      headers: {
+        access: `${accessToken}`,
+      },
+    });
+  } catch (error) {
+    console.error("계정 삭제 실패:", error);
+    throw new Error("계정 삭제에 실패했습니다.");
+  }
+};
