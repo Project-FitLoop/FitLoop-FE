@@ -1,8 +1,7 @@
 "use client";
 
-import { Card, Typography, Progress, Tag, List, Space, Divider, Button, Image, Tooltip } from "antd";
-import { ArrowLeftOutlined, QuestionCircleOutlined, CheckCircleTwoTone } from "@ant-design/icons";
-import Link from "next/link";
+import { Card, Typography, Progress, Tag, List, Space, Divider, Image, Tooltip } from "antd";
+import { QuestionCircleOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import BackButton from "@/ui/components/common/BackButton";
 
 const { Title, Text } = Typography;
@@ -116,7 +115,7 @@ export default function BenefitPageClient({ data }: Props) {
                             }}
                           >
                             <span style={{ fontSize: 18 }}>
-                              {EMOJI[tier.key]?.[lv-1] ?? "•"}
+                              {EMOJI[tier.key]?.[lv - 1] ?? "•"}
                             </span>
                           </div>
                           <Text type="secondary" className="text-xs mt-1">{lv}</Text>
