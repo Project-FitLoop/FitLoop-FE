@@ -1,21 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button, Typography, message, Spin } from "antd";
-import { ArrowLeftOutlined, WalletOutlined } from "@ant-design/icons";
+import { WalletOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { fetchWalletBalance } from "@/services/api/walletApi";
 import { instance } from "@/config/apiConfig";
 import BackButton from "@/ui/components/common/BackButton";
 
+const { Title, Text } = Typography;
+
 declare global {
   interface Window {
-    IMP: any;
+    IMP?: Iamport;
   }
 }
 
-const { Title, Text } = Typography;
+interface Iamport {
+  init: (code: string) => void;
+  request_pay: (
+    params: Record<string, unknown>,
+    callback: (rsp: IamportResponse) => void
+  ) => void;
+}
+
+interface IamportResponse {
+  success: boolean;
+  imp_uid?: string;
+  error_msg?: string;
+  paid_amount?: number;
+}
 
 const chargeOptions = [5000, 10000, 30000, 50000];
 
@@ -28,7 +42,6 @@ const ChargePage: React.FC = () => {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     const loadWallet = async () => {
@@ -45,17 +58,17 @@ const ChargePage: React.FC = () => {
     loadWallet();
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const script = document.createElement("script");
-    script.src = process.env.NEXT_PUBLIC_IAMPORT_JS_URL!;
+    script.src = process.env.NEXT_PUBLIC_IAMPORT_JS_URL || "";
     script.async = true;
     script.onload = () => {
-        if (window.IMP) {
-        window.IMP.init(process.env.NEXT_PUBLIC_IAMPORT_IMP_CODE!);
-        }
+      if (window.IMP) {
+        window.IMP.init(process.env.NEXT_PUBLIC_IAMPORT_IMP_CODE || "");
+      }
     };
     document.body.appendChild(script);
-    }, []);
+  }, []);
 
   const handleCharge = () => {
     if (!selectedAmount) {
@@ -69,48 +82,53 @@ const ChargePage: React.FC = () => {
       return;
     }
 
-    IMP.request_pay(
-      {
-        pg: "kakaopay.TC0ONETIME",
-        pay_method: "card",
-        name: `${selectedAmount.toLocaleString()}원 상품권`,
-        amount: selectedAmount,
-        buyer_email: "test@example.com",
-        buyer_name: "테스트 사용자",
-        buyer_tel: "010-1234-5678",
-      },
-      async (rsp: any) => {
-        if (rsp.success) {
-          try {
-            const accessToken = getAccessTokenFromCookie();
-            if (!accessToken) {
-              message.error("로그인이 필요합니다.");
-              return;
-            }
+    /* eslint-disable camelcase */
+    const payload: Record<string, unknown> = {
+      pg: "kakaopay.TC0ONETIME",
+      pay_method: "card",
+      name: `${selectedAmount.toLocaleString()}원 상품권`,
+      amount: selectedAmount,
+      buyer_email: "test@example.com",
+      buyer_name: "테스트 사용자",
+      buyer_tel: "010-1234-5678",
+    };
+    /* eslint-enable camelcase */
 
-            const res = await instance.post(
-              "/wallets/charge/verify",
-              null,
-              {
-                params: { impUid: rsp.imp_uid },
-                headers: { access: accessToken },
-              }
-            );
-
-            const newBalance = res.data.balance;
-            setWalletBalance(newBalance);
-            message.success(
-              `${res.data.paidAmount.toLocaleString()}원 충전 완료!`
-            );
-          } catch (err) {
-            console.error("충전 실패:", err);
-            message.error("서버와 통신 중 오류가 발생했습니다.");
+    IMP.request_pay(payload, async (rsp: IamportResponse) => {
+      if (rsp.success) {
+        try {
+          const accessToken = getAccessTokenFromCookie();
+          if (!accessToken) {
+            message.error("로그인이 필요합니다.");
+            return;
           }
-        } else {
-          message.error(`결제 실패: ${rsp.error_msg}`);
+
+          const res = await instance.post(
+            "/wallets/charge/verify",
+            null,
+            {
+              params: { impUid: rsp.imp_uid },
+              headers: { access: accessToken },
+            }
+          );
+
+          const newBalance: number = res.data.balance;
+          setWalletBalance(newBalance);
+
+          const paidAmount: number =
+            typeof res.data.paidAmount === "number"
+              ? res.data.paidAmount
+              : Number(rsp.paid_amount || selectedAmount);
+
+          message.success(`${paidAmount.toLocaleString()}원 충전 완료!`);
+        } catch (err) {
+          console.error("충전 실패:", err);
+          message.error("서버와 통신 중 오류가 발생했습니다.");
         }
+      } else {
+        message.error(`결제 실패: ${rsp.error_msg || "알 수 없는 오류"}`);
       }
-    );
+    });
   };
 
   return (
@@ -133,7 +151,7 @@ const ChargePage: React.FC = () => {
             <Spin size="small" />
           ) : (
             <Text strong className="text-xl text-black">
-              {walletBalance?.toLocaleString() ?? 0} 원
+              {(walletBalance ?? 0).toLocaleString()} 원
             </Text>
           )}
         </div>
@@ -153,6 +171,7 @@ const ChargePage: React.FC = () => {
                   ? "bg-yellow-100 border-yellow-500 text-yellow-700 shadow-sm"
                   : "bg-gray-50 border-gray-200 text-gray-700 hover:border-yellow-400"
               }`}
+              type="button"
             >
               <Image
                 src={`/assets/vouchers/${amount}.svg`}
@@ -168,19 +187,17 @@ const ChargePage: React.FC = () => {
       </div>
 
       <div className="bg-white px-4 py-5 mt-2">
-        <Text strong className="text-gray-800 block mb-3">
-          결제 수단
-        </Text>
+        <Text strong className="text-gray-800 block mb-3">결제 수단</Text>
         <div
           className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-yellow-400 cursor-pointer transition"
           onClick={handleCharge}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") handleCharge();
+          }}
         >
-          <Image
-            src="/assets/kakaopay-logo.png"
-            alt="KakaoPay"
-            width={40}
-            height={40}
-          />
+          <Image src="/assets/kakaopay-logo.png" alt="KakaoPay" width={40} height={40} />
           <Text className="text-black font-semibold">카카오페이 결제</Text>
         </div>
       </div>
@@ -197,9 +214,7 @@ const ChargePage: React.FC = () => {
           onClick={handleCharge}
           disabled={!selectedAmount}
         >
-          {selectedAmount
-            ? `${selectedAmount.toLocaleString()}원 결제하기`
-            : "결제 금액 선택"}
+          {selectedAmount ? `${selectedAmount.toLocaleString()}원 결제하기` : "결제 금액 선택"}
         </Button>
       </div>
     </div>
