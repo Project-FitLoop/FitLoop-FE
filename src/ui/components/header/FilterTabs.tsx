@@ -15,7 +15,7 @@ const FilterTabs = () => {
         <button
           className="text-sm px-4 py-2 rounded-full transition"
           style={{
-            backgroundColor: currentPath === "/product/popularity" ? "var(--bg-light-gray)" : "transparent",
+            backgroundColor: currentPath === "/product/popularity" ? "var(--bg-dark-gray)" : "transparent",
             color: currentPath === "/product/popularity" ? "var(--text-white)" : "var(--text-black)",
           }}
         >
@@ -26,7 +26,7 @@ const FilterTabs = () => {
         <button
           className="text-sm px-4 py-2 rounded-full transition"
           style={{
-            backgroundColor: currentPath === "/product/recent" ? "var(--bg-light-gray)" : "transparent",
+            backgroundColor: currentPath === "/product/recent" ? "var(--bg-dark-gray)" : "transparent",
             color: currentPath === "/product/recent" ? "var(--text-white)" : "var(--text-black)",
           }}
         >
@@ -37,7 +37,7 @@ const FilterTabs = () => {
         <button
           className="text-sm px-4 py-2 rounded-full transition"
           style={{
-            backgroundColor: currentPath === "/product/category" ? "var(--icon-dark-gray)" : "transparent",
+            backgroundColor: currentPath === "/product/category" ? "var(--bg-dark-gray)" : "transparent",
             color: currentPath === "/product/category" ? "var(--text-white)" : "var(--text-black)",
           }}
         >

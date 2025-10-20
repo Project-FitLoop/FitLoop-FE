@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { categories, subCategories } from "@/data/categories";
 import { Modal, message } from "antd";
-import { ExclamationCircleOutlined, RightOutlined} from "@ant-design/icons";
+import { ExclamationCircleOutlined, RightOutlined } from "@ant-design/icons";
 import { registerProduct } from "@/services/api/productApi";
 import { uploadImages } from "@/services/api/imageUpload";
 import BackButton from "@/ui/components/common/BackButton";
@@ -22,26 +22,28 @@ const ProductRegisterForm: React.FC = () => {
   const [usedCondition, setUsedCondition] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [gender, setGender] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [inputTag, setInputTag] = useState("");
   //화살표 상태
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
   // 모달
   const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-  const [isUsedConditionModalOpen, setIsUsedConditionModalOpen] = useState(false);
+  const [isUsedConditionModalOpen, setIsUsedConditionModalOpen] =
+    useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       const previews = files.map((file) => URL.createObjectURL(file));
-      
+
       setImages((prev) => [...prev, ...previews]);
       setImageFiles((prev) => [...prev, ...files]);
-  
+
       e.target.value = "";
     }
   };
@@ -59,15 +61,33 @@ const ProductRegisterForm: React.FC = () => {
   const handleRemoveImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
-  
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  };  
+  };
+
+  const handleAddTag = () => {
+    const trimmed = inputTag.trim();
+    if (trimmed && !tags.includes(trimmed) && tags.length < 5) {
+      setTags((prev) => [...prev, trimmed]);
+      setInputTag("");
+    }
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setTags((prev) => prev.filter((t) => t !== tag));
+  };
 
   const handleSave = async () => {
-    if (!productName || !category || !subCategory || !price || 
-      !productCondition || !gender
+    if (
+      !productName ||
+      !category ||
+      !subCategory ||
+      !price ||
+      !productCondition ||
+      !gender ||
+      (productCondition === "중고" && !usedCondition)
     ) {
       message.error("모든 필수 정보를 입력해주세요.");
       return;
@@ -77,14 +97,14 @@ const ProductRegisterForm: React.FC = () => {
     if (imageFiles.length > 0) {
       uploadedUrls = await uploadImages(imageFiles);
     }
-  
+
     const finalProductCondition = usedCondition || productCondition;
-  
+
     let finalSubCategory = subCategory;
     if (subCategory === "기타" || subCategory === "전체") {
       finalSubCategory = `${category}_${subCategory}`;
     }
-  
+
     const formData = {
       productName,
       category,
@@ -96,13 +116,14 @@ const ProductRegisterForm: React.FC = () => {
       images: uploadedUrls.length > 0 ? uploadedUrls : ["없음"],
       productCondition: finalProductCondition,
       productDescription,
+      tags,
     };
-  
+
     try {
       await registerProduct(formData);
       message.success("상품이 성공적으로 등록되었습니다.");
       images.forEach((src) => URL.revokeObjectURL(src));
-  
+
       setProductName("");
       setCategory("");
       setSubCategory("");
@@ -115,12 +136,12 @@ const ProductRegisterForm: React.FC = () => {
       setProductCondition("");
       setUsedCondition("");
       setProductDescription("");
-  
+
       router.push("/products/complete");
     } catch {
       message.error("상품 등록 중 오류가 발생했습니다.");
     }
-  };  
+  };
 
   return (
     <div className="max-w-md w-full bg-[var(--bg-white)] p-6 pb-10">
@@ -134,7 +155,9 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 상품명 */}
       <div className="mb-10">
-        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">상품명</label>
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+          <span className="text-red-500 mr-1">*</span>상품명
+        </label>
         <input
           type="text"
           maxLength={30}
@@ -147,7 +170,9 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 대 카테고리 */}
       <div className="mb-1">
-        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">카테고리</label>
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+          <span className="text-red-500 mr-1">*</span>카테고리
+        </label>
         <div className="relative mt-1">
           <select
             value={category}
@@ -176,10 +201,11 @@ const ProductRegisterForm: React.FC = () => {
         </div>
       </div>
 
-
       {/* 중 카테고리 */}
       <div className="mb-10">
-        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">상세 카테고리</label>
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+          <span className="text-red-500 mr-1">*</span>상세 카테고리
+        </label>
         <div className="relative mt-1">
           <select
             value={subCategory}
@@ -212,7 +238,9 @@ const ProductRegisterForm: React.FC = () => {
       </div>
 
       {/* 판매 가격 */}
-      <label className="text-[var(--text-dark-gray)] text-lg font-semibold">판매가격</label>
+      <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+        <span className="text-red-500 mr-1">*</span>판매가격
+      </label>
       <div className="mb-1 flex items-center space-x-2">
         <input
           type="number"
@@ -252,13 +280,24 @@ const ProductRegisterForm: React.FC = () => {
       <div className="mb-10">
         <label className="text-[var(--text-gray)] text-sm font-medium flex items-center cursor-pointer">
           <div
-            className={`w-4 h-4 flex items-center justify-center rounded-full border 
-              ${includeShipping ? "bg-[var(--bg-dark-gray)] " : "bg-[var(--bg-white)] border-[var(--border-light-gray)]"}`}
+            className={`w-4 h-4 flex items-center justify-center rounded-full border ${
+              includeShipping
+                ? "bg-[var(--bg-dark-gray)]"
+                : "bg-[var(--bg-white)] border-[var(--border-light-gray)]"
+            }`}
             onClick={() => setIncludeShipping(!includeShipping)}
           >
-            {includeShipping && <div className="w-1.5 h-1.5 bg-[var(--icon-white)] rounded-full"></div>}
+            {includeShipping && (
+              <div className="w-1.5 h-1.5 bg-[var(--icon-white)] rounded-full"></div>
+            )}
           </div>
-          <span className={`ml-2 ${includeShipping ? "text-[var(--text-black)]" : "text-[var(--text-gray)]"}`}>
+          <span
+            className={`ml-2 ${
+              includeShipping
+                ? "text-[var(--text-black)]"
+                : "text-[var(--text-gray)]"
+            }`}
+          >
             배송비 포함
           </span>
         </label>
@@ -266,7 +305,9 @@ const ProductRegisterForm: React.FC = () => {
 
       {/* 사용대상 */}
       <div className="mb-10">
-        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">사용대상</label>
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+          <span className="text-red-500 mr-1">*</span>사용대상
+        </label>
         <div className="flex justify-center space-x-2 mt-2">
           {["공용", "남성", "여성"].map((option) => (
             <button
@@ -284,11 +325,11 @@ const ProductRegisterForm: React.FC = () => {
         </div>
       </div>
 
-
-
       {/* 상품 사진 (여러 장 가능) */}
       <div className="mb-10">
-        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">사진</label>
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+          사진
+        </label>
         <div className="flex flex-wrap gap-2 mt-2">
           {images.map((src, index) => (
             <div key={index} className="relative w-24 h-24">
@@ -310,7 +351,13 @@ const ProductRegisterForm: React.FC = () => {
           ))}
           <label className="w-24 h-24 flex items-center justify-center border border-[var(--border-light-gray)] rounded-md cursor-pointer text-[var(--text-gray)] text-sm relative">
             +
-            <input type="file" accept="image/*" onChange={handleImageUpload} multiple className="hidden" />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              multiple
+              className="hidden"
+            />
           </label>
         </div>
       </div>
@@ -318,7 +365,9 @@ const ProductRegisterForm: React.FC = () => {
       {/* 상품 상태와 추가 중고 상품 상태 */}
       <div className="mb-10">
         <div>
-          <label className="text-[var(--text-dark-gray)] text-lg font-semibold">상품상태</label>
+          <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+            <span className="text-red-500 mr-1">*</span>상품상태
+          </label>
           <div className="flex space-x-2 mt-2">
             {["미개봉", "중고"].map((condition) => (
               <button
@@ -327,7 +376,7 @@ const ProductRegisterForm: React.FC = () => {
                   productCondition === condition
                     ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
                     : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
-                }`}                
+                }`}
                 onClick={() => setProductCondition(condition)}
               >
                 {condition}
@@ -346,34 +395,75 @@ const ProductRegisterForm: React.FC = () => {
             <RightOutlined className="ml-auto" />
           </div>
         </div>
-
         {productCondition === "중고" && (
-          <div className="mt-2">
-            {/* 추가 중고 상품 상태 */}
-            <div className="mt-6">
-              <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
-                추가 중고 상품 상태
-              </label>
-              <div className="flex space-x-2 mt-2">
-                {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
-                  <button
-                    key={condition}
-                    className={`px-4 py-2 rounded-md text-sm font-medium border ${
-                      usedCondition === condition
-                        ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
-                        : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
-                    }`}
-                    onClick={() => setUsedCondition(condition)}
-                  >
-                    {condition}
-                  </button>
-                ))}
-              </div>
+          <div className="mt-6">
+            <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+              <span className="text-red-500 mr-1">*</span>추가 중고 상품 상태
+            </label>
+            <div className="flex space-x-2 mt-2">
+              {["거의 새 상품", "좋음", "보통", "나쁨"].map((condition) => (
+                <button
+                  key={condition}
+                  className={`px-4 py-2 rounded-md text-sm font-medium border ${
+                    usedCondition === condition
+                      ? "border-[var(--border-gray)] bg-[var(--bg-dark-gray)] text-[var(--text-white)]"
+                      : "border-[var(--border-gray)] bg-[var(--bg-white)] text-[var(--text-dark-gray)]"
+                  }`}
+                  onClick={() => setUsedCondition(condition)}
+                >
+                  {condition}
+                </button>
+              ))}
             </div>
+            {!usedCondition && (
+              <p className="text-xs text-red-500 mt-1">추가 상태를 선택해주세요.</p>
+            )}
           </div>
         )}
       </div>
 
+      {/* 상품 태그 */}
+      <div className="mb-6">
+        <label className="text-[var(--text-dark-gray)] text-lg font-semibold">
+          상품 태그명
+        </label>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="bg-[var(--bg-light-gray)] px-3 py-1 rounded-full text-sm flex items-center"
+            >
+              <span>#{tag}</span>
+              <button
+                onClick={() => handleRemoveTag(tag)}
+                className="ml-2 text-gray-500 hover:text-red-500"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+        <div className="flex items-center mt-2">
+          <span className="text-gray-400 text-sm mr-2">#</span>
+          <input
+            type="text"
+            value={inputTag}
+            maxLength={30}
+            onChange={(e) => setInputTag(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddTag();
+              }
+            }}
+            placeholder="태그 입력 후 Enter"
+            className="flex-1 p-2 border border-[var(--border-light-gray)] rounded-md text-sm"
+          />
+        </div>
+        <p className="text-xs text-[var(--text-gray)] mt-1">
+          태그는 최대 5개까지 입력할 수 있어요.
+        </p>
+      </div>
 
       {/* 상품 설명 (사용자 입력 가능) */}
       <div className="mb-4">
@@ -413,9 +503,25 @@ const ProductRegisterForm: React.FC = () => {
       <button
         onClick={handleSave}
         className={`w-full p-3 text-white rounded-md font-medium ${
-          productName && category && subCategory && price ? "bg-black" : "bg-gray-400"
+          productName &&
+          category &&
+          subCategory &&
+          price &&
+          productCondition &&
+          gender &&
+          (productCondition !== "중고" || usedCondition)
+            ? "bg-black"
+            : "bg-gray-400"
         }`}
-        disabled={!productName || !category || !subCategory || !price}
+        disabled={
+          !productName ||
+          !category ||
+          !subCategory ||
+          !price ||
+          !productCondition ||
+          !gender ||
+          (productCondition === "중고" && !usedCondition)
+        }
       >
         저장하기
       </button>
@@ -427,19 +533,21 @@ const ProductRegisterForm: React.FC = () => {
         footer={null}
         centered
         title={
-          <h3 className="text-xl font-bold text-center text-gray-800">상품 등록 안내</h3>
+          <h3 className="text-xl font-bold text-center text-gray-800">
+            상품 등록 안내
+          </h3>
         }
         styles={{
           body: {
-            padding: '20px',
-            fontSize: '14px',
-            color: '#444',
-            lineHeight: '1.7',
-            maxHeight: '400px',
-            overflowY: 'auto',
+            padding: "20px",
+            fontSize: "14px",
+            color: "#444",
+            lineHeight: "1.7",
+            maxHeight: "400px",
+            overflowY: "auto",
           },
           header: {
-            borderBottom: '1px solid #f0f0f0',
+            borderBottom: "1px solid #f0f0f0",
           },
         }}
       >
@@ -458,21 +566,25 @@ const ProductRegisterForm: React.FC = () => {
         footer={null}
         centered
         title={
-          <h3 className="text-xl font-bold text-center text-gray-800">🔐 개인정보 제공 안내</h3>
+          <h3 className="text-xl font-bold text-center text-gray-800">
+            🔐 개인정보 제공 안내
+          </h3>
         }
         styles={{
           body: {
-            padding: '20px',
-            fontSize: '14px',
-            color: '#444',
-            lineHeight: '1.7',
+            padding: "20px",
+            fontSize: "14px",
+            color: "#444",
+            lineHeight: "1.7",
           },
         }}
       >
         <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
           <li>상품 거래를 위해 일부 개인정보가 제공될 수 있습니다.</li>
           <li>구매자와 원활한 거래를 위해 연락처가 공유될 수 있습니다.</li>
-          <li>등록된 정보는 암호화되어 저장되며, 제3자에게 제공되지 않습니다.</li>
+          <li>
+            등록된 정보는 암호화되어 저장되며, 제3자에게 제공되지 않습니다.
+          </li>
         </ul>
       </Modal>
 
@@ -483,14 +595,16 @@ const ProductRegisterForm: React.FC = () => {
         footer={null}
         centered
         title={
-          <h3 className="text-xl font-bold text-center text-gray-800">중고 상태 안내</h3>
+          <h3 className="text-xl font-bold text-center text-gray-800">
+            중고 상태 안내
+          </h3>
         }
         styles={{
           body: {
-            padding: '20px',
-            fontSize: '14px',
-            color: '#444',
-            lineHeight: '1.7',
+            padding: "20px",
+            fontSize: "14px",
+            color: "#444",
+            lineHeight: "1.7",
           },
         }}
       >

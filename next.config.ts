@@ -13,7 +13,15 @@ const nextConfig: NextConfig = {
         hostname: 'picsum.photos',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: process.env.NEXT_PUBLIC_IMAGE_BUCKET_HOST!,
+        pathname: '**',
+      },
     ],
+  },
+  devIndicators: {
+    appIsrStatus: false,
   },
 };
 

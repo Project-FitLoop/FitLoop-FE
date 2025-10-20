@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const loginUser = async (
   username: string,
   password: string
-): Promise<{ accessToken: string; personalInfo: boolean }> => {
+): Promise<{ personalInfo: boolean }> => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/login`,
@@ -14,14 +14,9 @@ export const loginUser = async (
       { withCredentials: true }
     );
 
-    const accessToken = response.headers["access"];
-    if (!accessToken) {
-      throw new Error("Access Token이 응답 헤더에 없습니다.");
-    }
-
     const personalInfo = response.data.personal_info;
 
-    return { accessToken, personalInfo };
+    return { personalInfo };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error("로그인 실패:", error.response?.data?.message || error.message);
@@ -79,52 +74,47 @@ export const getGoogleLoginUrl = async (): Promise<string> => {
   }
 };
 
-//Access Token 재발급 요청
-export const reissueAccessToken = async (): Promise<string> => {
-  try {
-    const response = await axios.post(
-      `${API_BASE_URL}/reissue`,
-      {},
-      { withCredentials: true } //Refresh Token 쿠키 포함
-    );
-
-    //응답 헤더에서 Access Token 추출
-    const accessToken = response.headers["access"];
-    if (!accessToken) {
-      throw new Error("Access Token이 응답 헤더에 없습니다.");
-    }
-    return accessToken;
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      console.error("Access Token 갱신 실패:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || "토큰 갱신 요청 실패");
-    } else {
-      console.error("Access Token 갱신 실패: 알 수 없는 오류", error);
-      throw new Error("알 수 없는 오류가 발생했습니다.");
-    }
-  }
+// 쿠키에서 특정 이름의 값을 꺼내는 함수
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+  return null;
 };
 
-//로그아웃 API 호출
+// access 토큰을 쿠키에서 꺼내서 로그아웃 요청
 export const logoutUser = async (): Promise<void> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
+    const accessToken = getCookie("access");
+
+    // access 없어도 그냥 요청
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers["access"] = accessToken;
+    }
+
+    const response = await axios.post(
+      `${API_BASE_URL}/logout`,
+      {},
+      {
+        withCredentials: true,
+        headers,
+      }
+    );
 
     if (response.status === 200) {
-      console.log("로그아웃 성공!");
-
-      // sessionStorage.removeItem("user");
-      document.cookie = "access=; path=/; max-age=0;";
+      console.log("로그아웃 성공");
     } else {
-      throw new Error("로그아웃 요청 실패");
+      console.warn("로그아웃 요청은 했지만 성공 응답이 아님:", response.status);
     }
+    document.cookie = "access=; path=/; max-age=0;";
   } catch (error: unknown) {
+    document.cookie = "access=; path=/; max-age=0;";
     if (axios.isAxiosError(error)) {
-      console.error("로그아웃 실패:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || "로그아웃 요청 실패");
+      console.error("로그아웃 요청 실패:", error.response?.data || error.message);
     } else {
-      console.error("로그아웃 실패: 알 수 없는 오류", error);
-      throw new Error("알 수 없는 오류가 발생했습니다.");
+      console.error("로그아웃 중 알 수 없는 오류:", error);
     }
   }
 };
+

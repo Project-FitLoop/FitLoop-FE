@@ -4,7 +4,7 @@ import FloatingActionButton from "@/ui/components/common/FloatingActionButton";
 export default function Page() {
   return (
     <div
-      id="scrollable-container" 
+      id="scrollable-container"
       className="scrollbar-hide"
       style={{
         height: "100vh",

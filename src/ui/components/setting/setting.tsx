@@ -46,11 +46,15 @@ const Settings: React.FC = () => {
             className={`flex justify-between items-center py-4 text-[16px] text-[var(--text-black)] border-b border-[var(--border-light-gray)] cursor-pointer ${
               index === settingItems.length - 1 ? "border-b-0" : ""
             }`}
-            onClick={
-              item === "로그아웃"
-                ? handleLogout
-                : () => alert(`${item} 클릭됨`)
-            }
+            onClick={() => {
+              if (item === "로그아웃") {
+                handleLogout();
+              } else if (item === "계정 정보 관리") {
+                router.push("/settings/account");
+              } else {
+                alert(`${item} 클릭됨`);
+              }
+            }}
           >
             <span className="font-medium">{item}</span>
             <RightOutlined className="text-[16px] text-[var(--icon-gray)]" />
