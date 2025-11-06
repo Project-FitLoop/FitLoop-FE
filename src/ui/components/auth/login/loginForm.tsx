@@ -17,26 +17,28 @@ interface LoginFormValues {
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const redirectPath = searchParams?.get('redirect') || '/mypage';
 
   const onFinish = useCallback(
     async (values: LoginFormValues) => {
       try {
         const { personalInfo, fullName, role } = await loginUser(values.username, values.password);
 
-        const content =
-          role === 'ADMIN'
-            ? `반갑습니다, 관리자 ${fullName}님`
-            : `안녕하세요, ${fullName}님`;
+        await message.success({
+          content: role === 'ADMIN' ? `반갑습니다, 관리자 ${fullName}님` : `안녕하세요, ${fullName}님`,
+          duration: 1,
+        });
 
-        await message.success({ content, duration: 1 });
-        router.replace(personalInfo ? redirectPath : '/personinfo');
+        const redirectParam = searchParams?.get('redirect');
+        const defaultByRole = role === 'ADMIN' ? '/dashboard' : '/mypage';
+        const target = personalInfo ? (redirectParam ?? defaultByRole) : '/personinfo';
+
+        router.replace(target);
       } catch (error) {
         console.error('로그인 오류:', error);
         message.error(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
       }
     },
-    [redirectPath, router]
+    [router, searchParams]
   );
 
   const onFinishFailed = useCallback(() => {

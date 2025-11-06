@@ -23,6 +23,7 @@ import {
   message,
   Upload,
 } from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
 import {
   HomeOutlined,
   UserOutlined,
@@ -141,7 +142,7 @@ export default function DashBoardForm() {
       key: 'total',
       width: 120,
       align: 'right' as const,
-      render: (v: number) => v.toLocaleString('ko-KR') + '원',
+      render: (v: number) => `${v.toLocaleString('ko-KR')}원`,
     },
     { title: '주문시간', dataIndex: 'createdAt', key: 'createdAt', width: 160 },
   ];
@@ -177,7 +178,7 @@ export default function DashBoardForm() {
   const [form] = Form.useForm();
   const [issueForm] = Form.useForm();
 
-  const [fileList, setFileList] = useState<any[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
 
   const [selectedGender, setSelectedGender] = useState<'A' | 'M' | 'F'>('A');
