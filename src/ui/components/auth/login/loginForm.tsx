@@ -29,7 +29,7 @@ export default function LoginForm() {
         });
 
         const redirectParam = searchParams?.get('redirect');
-        const defaultByRole = role === 'ADMIN' ? '/dashboard' : '/mypage';
+        const defaultByRole = role === 'ADMIN' ? '/admin/dashboard' : '/mypage';
         const target = personalInfo ? (redirectParam ?? defaultByRole) : '/personinfo';
 
         router.replace(target);
