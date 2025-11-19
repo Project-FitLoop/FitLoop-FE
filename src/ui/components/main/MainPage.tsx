@@ -15,6 +15,7 @@ import { useLikeStore } from '@/stores/likeStore';
 import { useRouter } from 'next/navigation';
 
 import { bannerConfigs, BannerConfig } from '@/data/banners';
+import WelcomeCouponModal from '@/ui/components/coupon/WelcomeCouponModal';
 
 export default function MainPage() {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -25,7 +26,17 @@ export default function MainPage() {
   const sliderRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  const [openWelcomeModal, setOpenWelcomeModal] = useState(false);
+
   const handleBannerClick = (banner: BannerConfig) => {
+    if (
+      banner.type === 'COUPON_DETAIL' &&
+      (banner.id === 'welcome-coupon-pack' || banner.target === '/coupon/welcome')
+    ) {
+      setOpenWelcomeModal(true);
+      return;
+    }
+
     if (banner.type === 'EXTERNAL') {
       window.open(banner.target, '_blank');
       return;
@@ -155,6 +166,7 @@ export default function MainPage() {
         color: 'var(--foreground)',
       }}
     >
+      {/* 배너 캐러셀 */}
       <div
         className="mt-4 max-h-[250px] overflow-hidden rounded-md"
         style={{ background: 'var(--bg-white)' }}
@@ -336,6 +348,11 @@ export default function MainPage() {
           ↑
         </button>
       )}
+
+      <WelcomeCouponModal
+        open={openWelcomeModal}
+        onClose={() => setOpenWelcomeModal(false)}
+      />
     </div>
   );
 }
