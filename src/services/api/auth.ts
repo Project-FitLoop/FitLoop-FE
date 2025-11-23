@@ -1,26 +1,51 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-//로그인 API 호출
+type UserRole = "ADMIN" | "MEMBER";
+
+interface RawLoginResponse {
+  fullName: string;
+  personal_info: boolean;
+  role: UserRole; 
+  message?: string;
+}
+
+export interface LoginResult {
+  personalInfo: boolean;
+  fullName: string;
+  role: UserRole;
+}
+
+// 로그인 API 호출
 export const loginUser = async (
   username: string,
   password: string
-): Promise<{ personalInfo: boolean }> => {
+): Promise<LoginResult> => {
   try {
-    const response = await axios.post(
+    const response = await axios.post<RawLoginResponse>(
       `${API_BASE_URL}/login`,
       { username, password },
       { withCredentials: true }
     );
 
-    const personalInfo = response.data.personal_info;
+    const data = response.data;
 
-    return { personalInfo };
+    // 필수 필드 안전 체크 및 매핑
+    const fullName = typeof data.fullName === "string" ? data.fullName : "";
+    const personalInfo = Boolean(data.personal_info);
+    const role: UserRole = (data.role === "ADMIN" || data.role === "MEMBER") ? data.role : "MEMBER";
+
+    return { fullName, personalInfo, role };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("로그인 실패:", error.response?.data?.message || error.message);
-      throw new Error(error.response?.data?.message || "로그인 요청 실패");
+      const serverMessage =
+        (error.response?.data as any)?.message ||
+        (error.response?.data as any)?.error ||
+        error.message;
+      console.error("로그인 실패:", serverMessage);
+      throw new Error(serverMessage || "로그인 요청 실패");
     } else {
       console.error("로그인 실패: 알 수 없는 오류", error);
       throw new Error("알 수 없는 오류가 발생했습니다.");
@@ -28,7 +53,7 @@ export const loginUser = async (
   }
 };
 
-//회원가입 API 호출
+// 회원가입 API 호출
 export const registerUser = async (
   username: string,
   password: string,
@@ -48,8 +73,12 @@ export const registerUser = async (
     window.location.href = "/login";
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("회원가입 실패:", error.response?.data?.error || error.message);
-      alert(error.response?.data?.error || "회원가입 요청 실패");
+      const serverMessage =
+        (error.response?.data as any)?.error ||
+        (error.response?.data as any)?.message ||
+        error.message;
+      console.error("회원가입 실패:", serverMessage);
+      alert(serverMessage || "회원가입 요청 실패");
     } else {
       console.error("회원가입 실패: 알 수 없는 오류", error);
       alert("알 수 없는 오류가 발생했습니다. 다시 시도해 주세요.");
@@ -57,12 +86,13 @@ export const registerUser = async (
   }
 };
 
-
-
-//Google OAuth2 로그인 URL 요청
+// Google OAuth2 로그인 URL 요청
 export const getGoogleLoginUrl = async (): Promise<string> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/auth/google`);
+    const response = await axios.get<{ authUrl?: string }>(
+      `${API_BASE_URL}/auth/google`,
+      { withCredentials: true }
+    );
     if (!response.data.authUrl) {
       throw new Error("Google 로그인 URL을 가져올 수 없습니다.");
     }
@@ -78,7 +108,7 @@ export const getGoogleLoginUrl = async (): Promise<string> => {
 const getCookie = (name: string): string | null => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+  if (parts.length === 2) return parts.pop()!.split(";").shift() || null;
   return null;
 };
 
@@ -117,4 +147,3 @@ export const logoutUser = async (): Promise<void> => {
     }
   }
 };
-
