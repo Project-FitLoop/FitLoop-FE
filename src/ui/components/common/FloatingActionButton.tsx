@@ -24,70 +24,112 @@ const FloatingActionButton: React.FC = () => {
   const navigateToProductRegister = () => {
     router.push("/products/register");
   };
+
   const navigateToLookRegister = () => {
     router.push("/looks/register");
   };
+
   const navigateToChallengeRegister = () => {
     router.push("/challenges/register");
   };
-  const navigateToCouponRegister = () => {
-    router.push("/coupons/register");
+
+  const openCouponModal = () => {
+    window.dispatchEvent(new CustomEvent("open-coupon-modal"));
   };
 
   return (
     <div style={styles.container}>
       <button
-        style={{ ...styles.upButton, bottom: isExpanded ? 110 : 65 }}
+        style={{
+          ...styles.upButton,
+          bottom: isMyShopPage
+            ? isExpanded
+              ? 265
+              : 65
+            : isExpanded
+            ? 110
+            : 65,
+        }}
         onClick={scrollToTop}
       >
         <UpOutlined style={{ fontSize: "20px", color: "#333" }} />
       </button>
 
       <div style={styles.buttonGroup}>
-        {isExpanded && (
+        {isMyShopPage ? (
           <>
-            {isMyShopPage ? (
-              <>
-                <button
-                  style={{ ...styles.registerButton, bottom: 105 }}
-                  onClick={navigateToChallengeRegister}
-                >
-                  챌린지 등록
-                </button>
+            <button
+              style={{
+                ...styles.registerButton,
+                bottom: 205,
+                opacity: isExpanded ? 1 : 0,
+                transform: isExpanded ? "translateY(0)" : "translateY(8px)",
+                pointerEvents: isExpanded ? "auto" : "none",
+              }}
+              onClick={openCouponModal}
+            >
+              쿠폰 등록
+            </button>
 
-                <button
-                  style={{ ...styles.registerButton, bottom: 205 }}
-                  onClick={navigateToCouponRegister}
-                >
-                  쿠폰 등록
-                </button>
+            <button
+              style={{
+                ...styles.registerButton,
+                bottom: 155,
+                opacity: isExpanded ? 1 : 0,
+                transform: isExpanded ? "translateY(0)" : "translateY(8px)",
+                pointerEvents: isExpanded ? "auto" : "none",
+              }}
+              onClick={navigateToLookRegister}
+            >
+              룩 등록
+            </button>
 
-                <button
-                  style={{ ...styles.registerButton, bottom: 55 }}
-                  onClick={navigateToProductRegister}
-                >
-                  상품 등록
-                </button>
-                <button
-                  style={{ ...styles.registerButton, bottom: 155 }}
-                  onClick={navigateToLookRegister}
-                >
-                  룩 등록
-                </button>
-              </>
-            ) : (
-              <button
-                style={{ ...styles.registerButton, bottom: 55 }}
-                onClick={navigateToProductRegister}
-              >
-                상품 등록
-              </button>
-              
-            )}
+            <button
+              style={{
+                ...styles.registerButton,
+                bottom: 105,
+                opacity: isExpanded ? 1 : 0,
+                transform: isExpanded ? "translateY(0)" : "translateY(8px)",
+                pointerEvents: isExpanded ? "auto" : "none",
+              }}
+              onClick={navigateToChallengeRegister}
+            >
+              챌린지 등록
+            </button>
+
+            <button
+              style={{
+                ...styles.registerButton,
+                bottom: 55,
+                opacity: isExpanded ? 1 : 0,
+                transform: isExpanded ? "translateY(0)" : "translateY(8px)",
+                pointerEvents: isExpanded ? "auto" : "none",
+              }}
+              onClick={navigateToProductRegister}
+            >
+              상품 등록
+            </button>
           </>
+        ) : (
+          <button
+            style={{
+              ...styles.registerButton,
+              bottom: 55,
+              opacity: isExpanded ? 1 : 0,
+              transform: isExpanded ? "translateY(0)" : "translateY(8px)",
+              pointerEvents: isExpanded ? "auto" : "none",
+            }}
+            onClick={navigateToProductRegister}
+          >
+            상품 등록
+          </button>
         )}
+
         <button
-          style={styles.plusButton}
+          style={{
+            ...styles.plusButton,
+            transform: isExpanded ? "rotate(45deg)" : "rotate(0deg)",
+          }}
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <PlusOutlined style={{ fontSize: "24px", color: "#fff" }} />
@@ -127,6 +169,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: "center",
     cursor: "pointer",
     boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+    zIndex: 20,
+    transition: "bottom 0.2s ease",
   },
   plusButton: {
     background: "#333",
@@ -139,6 +183,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: "center",
     cursor: "pointer",
     boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+    transition: "transform 0.2s ease",
   },
   registerButton: {
     position: "absolute",
@@ -152,6 +197,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: "16px",
     whiteSpace: "nowrap",
     boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+    zIndex: 10,
+    transition: "opacity 0.2s ease, transform 0.2s ease, bottom 0.2s ease",
   },
 };
 
