@@ -1,11 +1,14 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { PlusOutlined, UpOutlined } from "@ant-design/icons";
 
 const FloatingActionButton: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isMyShopPage = pathname?.startsWith("/myshop");
 
   const scrollToTop = () => {
     const scrollContainer = document.getElementById("scrollable-container");
@@ -18,13 +21,21 @@ const FloatingActionButton: React.FC = () => {
     }
   };
 
-  const navigateToRegister = () => {
+  const navigateToProductRegister = () => {
     router.push("/products/register");
+  };
+  const navigateToLookRegister = () => {
+    router.push("/looks/register");
+  };
+  const navigateToChallengeRegister = () => {
+    router.push("/challenges/register");
+  };
+  const navigateToCouponRegister = () => {
+    router.push("/coupons/register");
   };
 
   return (
     <div style={styles.container}>
-      {/* 화살표 버튼*/}
       <button
         style={{ ...styles.upButton, bottom: isExpanded ? 110 : 65 }}
         onClick={scrollToTop}
@@ -32,15 +43,49 @@ const FloatingActionButton: React.FC = () => {
         <UpOutlined style={{ fontSize: "20px", color: "#333" }} />
       </button>
 
-      {/* 버튼 그룹 */}
       <div style={styles.buttonGroup}>
         {isExpanded && (
-          <button style={styles.registerButton} onClick={navigateToRegister}>
-            상품 등록
-          </button>
-        )}
+          <>
+            {isMyShopPage ? (
+              <>
+                <button
+                  style={{ ...styles.registerButton, bottom: 105 }}
+                  onClick={navigateToChallengeRegister}
+                >
+                  챌린지 등록
+                </button>
 
-        {/* + 버튼 */}
+                <button
+                  style={{ ...styles.registerButton, bottom: 205 }}
+                  onClick={navigateToCouponRegister}
+                >
+                  쿠폰 등록
+                </button>
+
+                <button
+                  style={{ ...styles.registerButton, bottom: 55 }}
+                  onClick={navigateToProductRegister}
+                >
+                  상품 등록
+                </button>
+                <button
+                  style={{ ...styles.registerButton, bottom: 155 }}
+                  onClick={navigateToLookRegister}
+                >
+                  룩 등록
+                </button>
+              </>
+            ) : (
+              <button
+                style={{ ...styles.registerButton, bottom: 55 }}
+                onClick={navigateToProductRegister}
+              >
+                상품 등록
+              </button>
+              
+            )}
+          </>
+        )}
         <button
           style={styles.plusButton}
           onClick={() => setIsExpanded(!isExpanded)}
@@ -67,6 +112,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: "column",
     alignItems: "center",
     gap: 5,
+    position: "relative",
   },
   upButton: {
     position: "absolute",
@@ -96,7 +142,6 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   registerButton: {
     position: "absolute",
-    bottom: 55,
     right: 0,
     background: "#333",
     color: "#fff",
