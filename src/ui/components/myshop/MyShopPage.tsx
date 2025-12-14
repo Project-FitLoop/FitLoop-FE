@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CouponRegisterForm from "@/ui/components/coupon/CouponRegisterForm";
-import { DownloadOutlined } from "@ant-design/icons";
 
 type Tab = "product" | "look" | "challenge" | "like" | "bookmark";
 type Filter = "all" | "selling" | "soldout";

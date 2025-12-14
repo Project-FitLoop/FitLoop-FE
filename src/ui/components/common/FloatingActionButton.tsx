@@ -47,8 +47,8 @@ const FloatingActionButton: React.FC = () => {
               ? 265
               : 65
             : isExpanded
-            ? 110
-            : 65,
+              ? 110
+              : 65,
         }}
         onClick={scrollToTop}
       >

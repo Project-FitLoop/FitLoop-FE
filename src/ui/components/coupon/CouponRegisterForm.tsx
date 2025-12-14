@@ -37,8 +37,10 @@ const CouponRegisterForm = ({ onSubmitSuccess, onCancel }: CouponRegisterFormPro
       const discountValue = Number(discountAmount);
       const minOrderValue = Number(minOrderAmount);
 
-      if (Number.isNaN(discountValue) || discountValue <= 0) throw new Error("할인 금액을 올바르게 입력해주세요.");
-      if (Number.isNaN(minOrderValue) || minOrderValue < 0) throw new Error("최소 주문 금액을 올바르게 입력해주세요.");
+      if (Number.isNaN(discountValue) || discountValue <= 0)
+        throw new Error("할인 금액을 올바르게 입력해주세요.");
+      if (Number.isNaN(minOrderValue) || minOrderValue < 0)
+        throw new Error("최소 주문 금액을 올바르게 입력해주세요.");
 
       const validFromISO = new Date(validFrom).toISOString();
       const validToISO = new Date(validTo).toISOString();
@@ -64,6 +66,7 @@ const CouponRegisterForm = ({ onSubmitSuccess, onCancel }: CouponRegisterFormPro
 
       if (onSubmitSuccess) onSubmitSuccess();
       else router.back();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const msg =
         err?.response?.data?.message ??
@@ -81,6 +84,17 @@ const CouponRegisterForm = ({ onSubmitSuccess, onCancel }: CouponRegisterFormPro
     if (onCancel) onCancel();
     else router.back();
   };
+
+  // ✅ indent 에러 방지용: className 삼항식을 변수로 분리
+  const cancelBtnClass = `flex-1 h-11 rounded-full border text-[14px] ${
+    isSubmitting
+      ? "border-gray-200 text-gray-300 cursor-not-allowed"
+      : "border-gray-300 text-gray-700"
+  }`;
+
+  const submitBtnClass = `flex-1 h-11 rounded-full text-[14px] font-medium ${
+    isSubmitting ? "bg-gray-300 text-white cursor-not-allowed" : "bg-black text-white"
+  }`;
 
   return (
     <div className="pt-4 pb-2 text-gray-900">
@@ -223,25 +237,11 @@ const CouponRegisterForm = ({ onSubmitSuccess, onCancel }: CouponRegisterFormPro
             type="button"
             onClick={handleCancel}
             disabled={isSubmitting}
-            className={`flex-1 h-11 rounded-full border text-[14px]
-              ${
-                isSubmitting
-                  ? "border-gray-200 text-gray-300 cursor-not-allowed"
-                  : "border-gray-300 text-gray-700"
-              }`}
+            className={cancelBtnClass}
           >
             취소
           </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`flex-1 h-11 rounded-full text-[14px] font-medium
-              ${
-                isSubmitting
-                  ? "bg-gray-300 text-white cursor-not-allowed"
-                  : "bg-black text-white"
-              }`}
-          >
+          <button type="submit" disabled={isSubmitting} className={submitBtnClass}>
             {isSubmitting ? "발행 중..." : "쿠폰 발행하기"}
           </button>
         </div>

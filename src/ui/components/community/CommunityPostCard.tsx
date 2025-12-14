@@ -6,6 +6,7 @@ import { HeartOutlined, MessageOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function CommunityPostCard({ post }: { post: any }) {
   return (
     <Card
