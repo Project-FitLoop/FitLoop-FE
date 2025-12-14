@@ -84,9 +84,8 @@ export default function MyShopPage() {
         </div>
 
         {/* 쿠폰 버튼 */}
-        <button className="mt-5 w-full h-9 rounded-[12px] bg-[#f3f3f3] flex items-center justify-center text-[15px] text-gray-700 gap-2">
-          <DownloadOutlined style={{ fontSize: "18px", color: "#555" }} />
-          쿠폰 내려 받기
+        <button className="mt-5 w-full h-9 rounded-[12px] bg-[#666666] hover:bg-[#555555] active:bg-[#4a4a4a] transition flex items-center justify-center text-[15px] text-white gap-2">
+          프로필 편집
         </button>
       </header>
 
@@ -204,6 +203,7 @@ export default function MyShopPage() {
 
             <CouponRegisterForm
               onSubmitSuccess={() => setCouponModalOpen(false)}
+              onCancel={() => setCouponModalOpen(false)}
             />
           </div>
         </div>
