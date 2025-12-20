@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CouponRegisterForm from "@/ui/components/coupon/CouponRegisterForm";
+import { fetchMyCreatedCoupons } from "@/services/api/couponApi";
 
 type Tab = "product" | "look" | "challenge" | "like" | "bookmark";
 type Filter = "all" | "selling" | "soldout";
@@ -67,28 +68,18 @@ export default function MyShopPage() {
     setCouponModalOpen(false);
   };
 
-  const [createdCoupons, setCreatedCoupons] = useState<CreatedCoupon[]>([
-    {
-      id: 101,
-      title: "10% 할인 쿠폰",
-      discountText: "10% 할인",
-      minOrderText: "최소 주문 30,000원",
-      periodText: "2026.01.31까지",
-      status: "ACTIVE",
-      issuedCount: 42,
-      usedCount: 9,
-    },
-    {
-      id: 103,
-      title: "신규회원 5,000원 쿠폰",
-      discountText: "5,000원 할인",
-      minOrderText: "최소 주문 50,000원",
-      periodText: "기간 만료",
-      status: "EXPIRED",
-      issuedCount: 77,
-      usedCount: 51,
-    },
-  ]);
+  const [createdCoupons, setCreatedCoupons] = useState<CreatedCoupon[]>([]);
+
+  useEffect(() => {
+    if (!couponModalOpen) return;
+    if (couponModalMode !== "list") return;
+    if (couponTab !== "created") return;
+
+    (async () => {
+      const data = await fetchMyCreatedCoupons();
+      setCreatedCoupons(data);
+    })();
+  }, [couponModalOpen, couponModalMode, couponTab]);
 
   const [downloadedCoupons] = useState<DownloadedCoupon[]>([
     { id: 201, title: "10% 할인 쿠폰", benefitText: "10% 할인", periodText: "2026.01.31까지", stateText: "사용 가능" },
