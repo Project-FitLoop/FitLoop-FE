@@ -1,8 +1,8 @@
 "use client";
 
-import ProductRegisterForm from "@/ui/components/product/ProductRegisterForm";
+import CouponRegisterForm from "@/ui/components/coupon/CouponRegisterForm";
 
-const ProductRegisterPage = () => {
+const CouponRegisterPage = () => {
   return (
     <div
       id="scrollable-container"
@@ -13,15 +13,14 @@ const ProductRegisterPage = () => {
         scrollBehavior: "smooth",
       }}
     >
-      {/* 가운데 width 400px 고정 영역 */}
       <div
         style={{ width: "100%", maxWidth: "400px" }}
         className="mx-auto relative px-4 pb-10"
       >
-        <ProductRegisterForm />
+        <CouponRegisterForm />
       </div>
     </div>
   );
 };
 
-export default ProductRegisterPage;
+export default CouponRegisterPage;
