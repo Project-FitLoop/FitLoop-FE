@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { Form, Input, Button, Typography, Progress } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, Typography, Progress, message } from "antd";
 import type { Rule } from "antd/es/form";
-import { registerUser } from "@/services/api/auth";
+import { registerUser, sendEmailCode, verifyEmailCode } from "@/services/api/auth";
 
 const { Title, Text } = Typography;
 
@@ -24,32 +24,73 @@ interface RegisterFormValues {
 }
 
 const RegisterForm: React.FC = () => {
+  const [form] = Form.useForm<RegisterFormValues>();
   const [currentStep, setCurrentStep] = useState(0);
   const [formValues, setFormValues] = useState<RegisterFormValues>({});
+
+  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [authCode, setAuthCode] = useState("");
+  const [timer, setTimer] = useState(300);
+  const [loading, setLoading] = useState(false);
+
+  const currentField = steps[currentStep].field;
+  const isEmailStep = currentField === "email";
+  const isEmailLocked = isEmailStep && isEmailVerified;
+
+  /* 타이머 */
+  useEffect(() => {
+    if (!isCodeSent || timer <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isCodeSent, timer]);
 
   const handleNext = async (values: Partial<RegisterFormValues>) => {
     const updatedValues = { ...formValues, ...values };
     setFormValues(updatedValues);
-
+    if (currentField === "email" && !isEmailVerified) {
+      message.error('이메일 인증을 완료해 주세요.');
+      return;
+    }
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
-    } else {
-      try {
-        await registerUser(
-          updatedValues.username!,
-          updatedValues.password!,
-          updatedValues.email!,
-          updatedValues.name!,
-          updatedValues.birthday!
-        );
-        alert("회원가입이 완료되었습니다!");
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          alert(error.message);
-        } else {
-          alert("알 수 없는 오류가 발생했습니다.");
-        }
-      }
+      form.setFieldsValue(updatedValues);
+      return;
+    }
+    try {
+      await registerUser(
+        updatedValues.username!,
+        updatedValues.password!,
+        updatedValues.email!,
+        updatedValues.name!,
+        updatedValues.birthday!
+      );
+      message.success('회원가입이 완료되었습니다.');
+    } catch (e: any) {
+      message.error(`회원가입 중 오류가 발생했습니다.`);
+    }
+  };
+
+  const handleSendEmailCode = async () => {
+    try {
+      await form.validateFields(["email"]);
+      setLoading(true);
+
+      const email = form.getFieldValue("email");
+      await sendEmailCode(email);
+
+      setIsCodeSent(true);
+      setTimer(300);
+      message.info(`인증번호가 발송되었습니다.`);
+    } catch (e: any) {
+      if (e?.errorFields) return; // validation 에러
+      message.error(e.message || "인증번호 발송 실패");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,30 +182,155 @@ const RegisterForm: React.FC = () => {
 
       {/* 입력 필드 */}
       <Form
-        onFinish={(values) => handleNext(values)}
-        style={{
-          width: "100%",
-          padding: "0 16px",
-        }}
-        initialValues={formValues}
+        form={form}
+        onFinish={handleNext}
+        style={{ width: "100%", padding: "0 16px" }}
+
       >
-        <Form.Item
-          name={steps[currentStep].field}
-          rules={validationRules[steps[currentStep].field as keyof RegisterFormValues] as Rule[]}
-          style={{ marginBottom: 40 }}
-        >
-          <Input
-            placeholder={steps[currentStep].placeholder}
-            type={steps[currentStep].field === "password" ? "password" : "text"} // 비밀번호 필드는 입력 타입 변경
-            style={{
-              border: "none",
-              borderBottom: "1px solid var(--border-light-gray)",
-              borderRadius: 0,
-              padding: "8px 0",
-              fontSize: 16,
-            }}
-          />
-        </Form.Item>
+        {/* 이메일 입력 + 인증 버튼 */}
+        {currentField === "email" && !isCodeSent ? (
+          <Form.Item
+            name="email"
+            rules={validationRules.email as Rule[]}
+            style={{ marginBottom: 40 }}
+          >
+            <div
+              style={{ display: "flex", gap: 12, alignItems: "center" }}
+            >
+              <Input
+                disabled={isCodeSent}
+                placeholder={steps[currentStep].placeholder}
+                style={{
+                  flex: 7,
+                  border: "none",
+                  borderBottom: "1px solid var(--border-light-gray)",
+                  borderRadius: 0,
+                  padding: "8px 0",
+                  fontSize: 16,
+                }}
+              />
+
+              <Button
+                disabled={isCodeSent}
+                loading={loading}
+                style={{
+                  flex: 3,
+                  borderBottom: "1px solid var(--border-light-gray)",
+                  borderRadius: 10,
+                  padding: "16px 0",
+                  fontSize: 14,
+                  margin: 10,
+                }}
+                onClick={handleSendEmailCode}
+              >
+                인증번호 발송
+              </Button>
+            </div>
+          </Form.Item>
+        ) : (
+          /* 기존 일반 입력 필드 */
+          <Form.Item
+            name={steps[currentStep].field}
+            rules={
+              validationRules[
+              steps[currentStep].field as keyof RegisterFormValues
+              ] as Rule[]
+            }
+            style={{ marginBottom: 40 }}
+          >
+            <Input
+              disabled={isEmailLocked}
+              placeholder={steps[currentStep].placeholder}
+              type={
+                steps[currentStep].field === "password" ? "password" : "text"
+              }
+              style={{
+                border: "none",
+                borderBottom: "1px solid var(--border-light-gray)",
+                borderRadius: 0,
+                padding: "8px 0",
+                fontSize: 16,
+              }}
+            />
+          </Form.Item>
+        )}
+
+        {/* 인증번호 입력 단계 */}
+        {currentField === "email" && isCodeSent && !isEmailVerified && (
+          <>
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+                alignItems: "center",
+              }}
+            >
+              <Input
+                placeholder={"인증번호"}
+                value={authCode}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
+                onChange={(e) => {
+                  const onlyNumber = e.target.value.replace(/[^0-9]/g, "");
+                  setAuthCode(onlyNumber);
+                }}
+                suffix={
+                  <span style={{ color: "#d9534f" }}>
+                    {Math.floor(timer / 60)}:
+                    {(timer % 60).toString().padStart(2, "0")}
+                  </span>
+                }
+                style={{
+                  flex: 7,
+                  border: "none",
+                  borderBottom: "1px solid var(--border-light-gray)",
+                  borderRadius: 0,
+                  padding: "8px 0",
+                  fontSize: 16,
+                }}
+              />
+              <Button
+                loading={loading}
+                style={{
+                  flex: 3,
+                  borderBottom: "1px solid var(--border-light-gray)",
+                  borderRadius: 10,
+                  padding: "16px 0",
+                  fontSize: 14,
+                }}
+                onClick={handleSendEmailCode}
+              >
+                재전송
+              </Button>
+              <Button
+                loading={loading}
+                style={{
+                  flex: 3,
+                  borderBottom: "1px solid var(--border-light-gray)",
+                  borderRadius: 10,
+                  padding: "16px 0",
+                  fontSize: 14,
+                }}
+                onClick={async () => {
+                  try {
+                    setLoading(true);
+                    const email = form.getFieldValue("email");
+                    await verifyEmailCode(email, authCode);
+                    setIsEmailVerified(true);
+                    message.success("이메일 인증 완료");
+                  } catch (e: any) {
+                    message.error("인증번호가 올바르지 않습니다.");
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                인증 확인
+              </Button>
+            </div>
+          </>
+        )}
       </Form>
 
       {/* 하단 버튼 */}
