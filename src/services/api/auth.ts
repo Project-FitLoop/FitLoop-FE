@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
+import { instance } from '@/config/apiConfig';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -16,6 +17,10 @@ export interface LoginResult {
   personalInfo: boolean;
   fullName: string;
   role: UserRole;
+}
+
+interface EmailAuthResponse {
+  message?: string;
 }
 
 // 로그인 API 호출
@@ -146,4 +151,15 @@ export const logoutUser = async (): Promise<void> => {
       console.error("로그아웃 중 알 수 없는 오류:", error);
     }
   }
+};
+
+export const sendEmailCode = async (email: string): Promise<void> => {
+  await instance.post<EmailAuthResponse>("/send-code", { email });
+};
+
+export const verifyEmailCode = async (
+  email: string,
+  code: string
+): Promise<void> => {
+  await instance.post<EmailAuthResponse>("/verify-code", { email, code });
 };
