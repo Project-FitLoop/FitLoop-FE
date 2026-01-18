@@ -14,8 +14,8 @@ import KakaoMap from '@/ui/components/map/KakaoMap';
 import { useLikeStore } from '@/stores/likeStore';
 import { useRouter } from 'next/navigation';
 
-const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL ?? '';
-const banners = Array.from({ length: 5 }, (_, i) => `${s3BaseUrl}advertisement_${i + 1}.png`);
+import { bannerConfigs, BannerConfig } from '@/data/banners';
+import WelcomeCouponModal from '@/ui/components/coupon/WelcomeCouponModal';
 
 export default function MainPage() {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -25,6 +25,25 @@ export default function MainPage() {
   const setLikeCount = useLikeStore((state) => state.setLikeCount);
   const sliderRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const [openWelcomeModal, setOpenWelcomeModal] = useState(false);
+
+  const handleBannerClick = (banner: BannerConfig) => {
+    if (
+      banner.type === 'COUPON_DETAIL' &&
+      (banner.id === 'welcome-coupon-pack' || banner.target === '/coupon/welcome')
+    ) {
+      setOpenWelcomeModal(true);
+      return;
+    }
+
+    if (banner.type === 'EXTERNAL') {
+      window.open(banner.target, '_blank');
+      return;
+    }
+
+    router.push(banner.target);
+  };
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
@@ -129,28 +148,76 @@ export default function MainPage() {
   }, [popularProducts]);
 
   const scrollToTop = () => {
-    document.getElementById('scrollable-container')?.scrollTo({ top: 0, behavior: 'smooth' });
+    document
+      .getElementById('scrollable-container')
+      ?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div
       id="scrollable-container"
       className="scrollbar-hide px-4 pb-16"
-      style={{ height: '100vh', overflowY: 'auto', overflowX: 'hidden', scrollBehavior: 'smooth', background: 'var(--bg-gray)', color: 'var(--foreground)' }}
+      style={{
+        height: '100vh',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        scrollBehavior: 'smooth',
+        background: 'var(--bg-gray)',
+        color: 'var(--foreground)',
+      }}
     >
-      {/* 광고 배너 */}
-      <div className="mt-4 max-h-[250px] overflow-hidden rounded-md" style={{ background: 'var(--bg-white)' }}>
+      {/* 배너 캐러셀 */}
+      <div
+        className="mt-4 max-h-[250px] overflow-hidden rounded-md"
+        style={{ background: 'var(--bg-white)' }}
+      >
         <Carousel autoplay dots>
-          {banners.map((banner, index) => (
-            <div key={index}>
-              <Image
-                src={banner}
-                alt={`광고 ${index + 1}`}
-                width={400}
-                height={250}
-                className="w-full h-[200px] object-cover"
-                loading="lazy"
-              />
+          {bannerConfigs.map((banner) => (
+            <div key={banner.id}>
+              <div
+                className="relative w-full h-[200px] cursor-pointer"
+                onClick={() => handleBannerClick(banner)}
+              >
+                <Image
+                  src={banner.imageUrl}
+                  alt={banner.title ?? '광고 배너'}
+                  fill
+                  className="object-cover"
+                  loading="lazy"
+                />
+                {banner.badge && (
+                  <div
+                    className="absolute left-4 top-4 px-2 py-0.5 rounded-full text-xs font-semibold"
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.6)',
+                      color: '#fff',
+                    }}
+                  >
+                    {banner.badge}
+                  </div>
+                )}
+
+                {(banner.title || banner.subtitle) && (
+                  <div
+                    className="absolute left-4 bottom-4 right-4 rounded-md px-3 py-2"
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.45)',
+                      color: '#fff',
+                    }}
+                  >
+                    {banner.title && (
+                      <p className="text-sm font-semibold line-clamp-1">
+                        {banner.title}
+                      </p>
+                    )}
+                    {banner.subtitle && (
+                      <p className="mt-0.5 text-xs text-gray-100 line-clamp-1">
+                        {banner.subtitle}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </Carousel>
@@ -158,11 +225,20 @@ export default function MainPage() {
 
       {/* 최근 등록된 상품 */}
       <section className="my-6 -mx-4">
-        <div className="rounded-md py-4 px-4" style={{ background: 'var(--bg-white)' }}>
+        <div
+          className="rounded-md py-4 px-4"
+          style={{ background: 'var(--bg-white)' }}
+        >
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-base font-semibold">최근 등록된 상품</h2>
             <Link href="/product/recent">
-              <Image src="/assets/common/left-arrow.svg" alt="더보기" width={16} height={16} className="rotate-180 mr-1" />
+              <Image
+                src="/assets/common/left-arrow.svg"
+                alt="더보기"
+                width={16}
+                height={16}
+                className="rotate-180 mr-1"
+              />
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -173,8 +249,11 @@ export default function MainPage() {
                 product={{
                   id: product.id,
                   name: product.name,
-                  imageUrl: product.imageUrls?.[0] ?? '/assets/product/no-image.png',
-                  price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
+                  imageUrl:
+                    product.imageUrls?.[0] ?? '/assets/product/no-image.png',
+                  price: product.free
+                    ? '무료나눔'
+                    : `${product.price.toLocaleString()}원`,
                   tags: product.tags ?? [],
                   likedByMe: product.likedByMe,
                   likeCount: product.likeCount,
@@ -187,14 +266,27 @@ export default function MainPage() {
 
       {/* 인기 상품 */}
       <section className="my-6 -mx-4">
-        <div className="rounded-md py-4 px-4" style={{ background: 'var(--bg-white)' }}>
+        <div
+          className="rounded-md py-4 px-4"
+          style={{ background: 'var(--bg-white)' }}
+        >
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-base font-semibold">인기 상품</h2>
             <Link href="/product/popularity">
-              <Image src="/assets/common/left-arrow.svg" alt="더보기" width={16} height={16} className="rotate-180 mr-1" />
+              <Image
+                src="/assets/common/left-arrow.svg"
+                alt="더보기"
+                width={16}
+                height={16}
+                className="rotate-180 mr-1"
+              />
             </Link>
           </div>
-          <div ref={sliderRef} className="flex gap-4 overflow-x-scroll px-2 scrollbar-hide cursor-grab select-none" style={{ scrollBehavior: 'auto' }}>
+          <div
+            ref={sliderRef}
+            className="flex gap-4 overflow-x-scroll px-2 scrollbar-hide cursor-grab select-none"
+            style={{ scrollBehavior: 'auto' }}
+          >
             {popularProducts.map((product, index) => (
               <div
                 key={product.id}
@@ -208,8 +300,12 @@ export default function MainPage() {
                   product={{
                     id: product.id,
                     name: product.name,
-                    imageUrl: product.imageUrls?.[0] ?? '/assets/product/no-image.png',
-                    price: product.free ? '무료나눔' : `${product.price.toLocaleString()}원`,
+                    imageUrl:
+                      product.imageUrls?.[0] ??
+                      '/assets/product/no-image.png',
+                    price: product.free
+                      ? '무료나눔'
+                      : `${product.price.toLocaleString()}원`,
                     tags: product.tags ?? [],
                     likedByMe: product.likedByMe,
                     likeCount: product.likeCount,
@@ -223,11 +319,20 @@ export default function MainPage() {
 
       {/* 오프라인 매장 위치 */}
       <section className="my-6 -mx-4">
-        <div className="rounded-md py-4 px-4" style={{ background: 'var(--bg-white)' }}>
+        <div
+          className="rounded-md py-4 px-4"
+          style={{ background: 'var(--bg-white)' }}
+        >
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-base font-semibold">오프라인 매장 위치</h2>
             <Link href="https://map.kakao.com/" target="_blank">
-              <Image src="/assets/common/left-arrow.svg" alt="더보기" width={16} height={16} className="rotate-180 mr-1" />
+              <Image
+                src="/assets/common/left-arrow.svg"
+                alt="더보기"
+                width={16}
+                height={16}
+                className="rotate-180 mr-1"
+              />
             </Link>
           </div>
           <KakaoMap />
@@ -243,6 +348,11 @@ export default function MainPage() {
           ↑
         </button>
       )}
+
+      <WelcomeCouponModal
+        open={openWelcomeModal}
+        onClose={() => setOpenWelcomeModal(false)}
+      />
     </div>
   );
 }

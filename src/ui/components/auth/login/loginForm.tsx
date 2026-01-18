@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Form, Input, Button, Checkbox, Divider, Typography, message } from 'antd';
 import Image from 'next/image';
 import { loginUser, getGoogleLoginUrl } from '@/services/api/auth';
@@ -14,22 +14,31 @@ interface LoginFormValues {
   password: string;
 }
 
-export default function LoginPage() {
+export default function LoginForm() {
   const searchParams = useSearchParams();
-  const redirectPath = searchParams?.get('redirect') || '/mypage';
+  const router = useRouter();
 
   const onFinish = useCallback(
     async (values: LoginFormValues) => {
       try {
-        const { personalInfo } = await loginUser(values.username, values.password);
-        message.success('로그인에 성공했습니다.');
-        window.location.href = personalInfo ? redirectPath : '/personinfo';
+        const { personalInfo, fullName, role } = await loginUser(values.username, values.password);
+
+        await message.success({
+          content: role === 'ADMIN' ? `반갑습니다, 관리자 ${fullName}님` : `안녕하세요, ${fullName}님`,
+          duration: 1,
+        });
+
+        const redirectParam = searchParams?.get('redirect');
+        const defaultByRole = role === 'ADMIN' ? '/admin/dashboard' : '/mypage';
+        const target = personalInfo ? (redirectParam ?? defaultByRole) : '/personinfo';
+
+        router.replace(target);
       } catch (error) {
         console.error('로그인 오류:', error);
         message.error(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
       }
     },
-    [redirectPath]
+    [router, searchParams]
   );
 
   const onFinishFailed = useCallback(() => {
@@ -39,15 +48,18 @@ export default function LoginPage() {
   const handleGoogleLogin = useCallback(async () => {
     try {
       const googleLoginUrl = await getGoogleLoginUrl();
-      if (googleLoginUrl) window.location.href = googleLoginUrl;
-      else message.error('Google 로그인 URL을 가져올 수 없습니다.');
+      if (googleLoginUrl) {
+        window.location.href = googleLoginUrl;
+      } else {
+        message.error('Google 로그인 URL을 가져올 수 없습니다.');
+      }
     } catch {
       message.error('Google 로그인 요청 실패!');
     }
   }, []);
 
   return (
-    <div className="flex justify-center items-start bg-white h-screen px-4 pt-28">
+    <div className="flex justify-center items-start bg-white px-4 pt-28">
       <div className="w-full max-w-sm">
         {/* 로고 */}
         <div className="flex justify-center mb-4">
@@ -85,6 +97,7 @@ export default function LoginPage() {
                 size="large"
                 className="rounded-md h-11 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
                 placeholder="you@example.com"
+                autoComplete="username"
               />
             </Form.Item>
 
@@ -97,6 +110,7 @@ export default function LoginPage() {
                 size="large"
                 className="rounded-md h-11 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
                 placeholder="••••••••"
+                autoComplete="current-password"
               />
             </Form.Item>
 
