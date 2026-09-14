@@ -1,4 +1,9 @@
 # 👗 FITLOOP - Frontend
+
+<p align="right">
+  <strong>한국어</strong> | <a href="./README.en.md">English</a>
+</p>
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/b6bb06a6-a87c-4507-8a58-7600ed47b422" alt="FITLOOP Logo">
 </p>
